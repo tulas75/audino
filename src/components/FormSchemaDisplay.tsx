@@ -13,85 +13,113 @@ const FormSchemaDisplay: React.FC = () => {
   } = useFormSchema();
 
   if (loading) {
-    return <div>Loading form schema...</div>;
+    return (
+      <div className="card">
+        <div className="card-body" style={{ textAlign: 'center' }}>
+          <span className="loading-spinner"></span>
+          <span style={{ marginLeft: '0.5rem' }}>Loading form schema...</span>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div style={{ color: 'red', padding: '1rem', border: '1px solid red', borderRadius: '4px' }}>
-        Error loading form schema: {error.message}
+      <div className="alert alert-error">
+        <strong>Error loading form schema:</strong> {error.message}
       </div>
     );
   }
 
   return (
-    <div style={{ marginBottom: '2rem', border: '1px solid #ddd', borderRadius: '8px' }}>
+    <div className="accordion">
       <button
+        className="accordion-header"
         onClick={() => setIsExpanded(!isExpanded)}
-        style={{
-          width: '100%',
-          padding: '1rem',
-          backgroundColor: '#f8f9fa',
-          border: 'none',
-          borderRadius: '8px 8px 0 0',
-          cursor: 'pointer',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          fontSize: '1.1rem',
-          fontWeight: 'bold'
-        }}
       >
-        <span>📋 Form Schema Configuration (Mock Data)</span>
-        <span>{isExpanded ? '▼' : '▶'}</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          📋 Form Schema Configuration
+          <span style={{ 
+            fontSize: '0.75rem',
+            padding: '0.25rem 0.5rem',
+            background: 'var(--warning-500)',
+            color: 'white',
+            borderRadius: '9999px'
+          }}>
+            Mock Data
+          </span>
+        </span>
+        <span style={{ fontSize: '1.25rem' }}>{isExpanded ? '▼' : '▶'}</span>
       </button>
       
       {isExpanded && (
-        <div style={{ padding: '1rem' }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <h4>Schema Name: {formSchemaName}</h4>
-          </div>
+        <div className="accordion-content">
+          <div style={{ display: 'grid', gap: '1.5rem' }}>
+            <div>
+              <h4 style={{ 
+                color: 'var(--primary-600)', 
+                marginBottom: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                🏷️ Schema Name
+              </h4>
+              <div style={{ 
+                padding: '0.75rem 1rem',
+                background: 'var(--primary-50)',
+                borderRadius: 'var(--radius-md)',
+                fontFamily: 'monospace',
+                fontWeight: '500'
+              }}>
+                {formSchemaName}
+              </div>
+            </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <h4>Form Schema:</h4>
-            <pre style={{ 
-              backgroundColor: '#f5f5f5', 
-              padding: '1rem', 
-              borderRadius: '4px', 
-              overflow: 'auto',
-              fontSize: '0.9rem',
-              maxHeight: '300px'
-            }}>
-              {JSON.stringify(formSchema, null, 2)}
-            </pre>
-          </div>
+            <div>
+              <h4 style={{ 
+                color: 'var(--primary-600)', 
+                marginBottom: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                📝 Form Schema
+              </h4>
+              <pre style={{ maxHeight: '300px' }}>
+                {JSON.stringify(formSchema, null, 2)}
+              </pre>
+            </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <h4>Example Data:</h4>
-            <pre style={{ 
-              backgroundColor: '#f5f5f5', 
-              padding: '1rem', 
-              borderRadius: '4px', 
-              overflow: 'auto',
-              fontSize: '0.9rem',
-              maxHeight: '200px'
-            }}>
-              {JSON.stringify(formSchemaExampleData, null, 2)}
-            </pre>
-          </div>
+            <div>
+              <h4 style={{ 
+                color: 'var(--primary-600)', 
+                marginBottom: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                💡 Example Data
+              </h4>
+              <pre style={{ maxHeight: '200px' }}>
+                {JSON.stringify(formSchemaExampleData, null, 2)}
+              </pre>
+            </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <h4>Form Choices:</h4>
-            <pre style={{ 
-              backgroundColor: '#f5f5f5', 
-              padding: '1rem', 
-              borderRadius: '4px', 
-              overflow: 'auto',
-              fontSize: '0.9rem',
-              maxHeight: '200px'
-            }}>
-              {JSON.stringify(formSchemaChoices, null, 2)}
-            </pre>
+            <div>
+              <h4 style={{ 
+                color: 'var(--primary-600)', 
+                marginBottom: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                🎯 Form Choices
+              </h4>
+              <pre style={{ maxHeight: '200px' }}>
+                {JSON.stringify(formSchemaChoices, null, 2)}
+              </pre>
+            </div>
           </div>
         </div>
       )}

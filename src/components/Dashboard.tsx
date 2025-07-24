@@ -23,29 +23,84 @@ const Dashboard = () => {
   const displayUser = userProfile || user;
 
   return (
-    <div className="container">
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h1>Audio PWA Dashboard</h1>
-        <div>
-          <span>Welcome, {displayUser?.name || displayUser?.email}</span>
-          {profileLoading && <span style={{ marginLeft: '0.5rem', fontSize: '0.8rem' }}>(Loading profile...)</span>}
-          <button onClick={logout} className="btn btn-danger" style={{ marginLeft: '1rem' }}>
-            Logout
-          </button>
+    <div style={{ minHeight: '100vh', paddingBottom: '2rem' }}>
+      {/* Header */}
+      <header style={{ 
+        background: 'white',
+        borderBottom: '1px solid var(--gray-200)',
+        boxShadow: 'var(--shadow-sm)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 10
+      }}>
+        <div className="container" style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          padding: '1rem',
+          maxWidth: '1200px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ 
+              fontSize: '1.5rem', 
+              fontWeight: '700', 
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}>
+              🎵 Audino
+            </div>
+            <div style={{ 
+              padding: '0.25rem 0.75rem',
+              background: 'var(--primary-100)',
+              color: 'var(--primary-700)',
+              borderRadius: '9999px',
+              fontSize: '0.75rem',
+              fontWeight: '500'
+            }}>
+              AI Audio Processing
+            </div>
+          </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontWeight: '500', color: 'var(--gray-900)' }}>
+                {displayUser?.name || displayUser?.email}
+              </div>
+              {profileLoading && (
+                <div style={{ fontSize: '0.75rem', color: 'var(--gray-500)' }}>
+                  Loading profile...
+                </div>
+              )}
+            </div>
+            <button onClick={logout} className="btn btn-secondary">
+              Sign Out
+            </button>
+          </div>
         </div>
       </header>
 
       {profileError && (
-        <div style={{ color: 'red', marginBottom: '1rem', padding: '0.5rem', border: '1px solid red', borderRadius: '4px' }}>
-          Error loading profile: {profileError.message}
+        <div className="container" style={{ paddingTop: '1rem' }}>
+          <div className="alert alert-error">
+            Error loading profile: {profileError.message}
+          </div>
         </div>
       )}
 
-      
-      <main>
-        <FormSchemaDisplay />
-        <AudioRecorder onRecordingSaved={handleRecordingSaved} />
-        <RecordingsList ref={recordingsListRef} />
+      {/* Main Content */}
+      <main className="container" style={{ paddingTop: '2rem' }}>
+        <div style={{ 
+          display: 'grid', 
+          gap: '2rem',
+          gridTemplateColumns: '1fr',
+          maxWidth: '1000px',
+          margin: '0 auto'
+        }}>
+          <FormSchemaDisplay />
+          <AudioRecorder onRecordingSaved={handleRecordingSaved} />
+          <RecordingsList ref={recordingsListRef} />
+        </div>
       </main>
     </div>
   );
