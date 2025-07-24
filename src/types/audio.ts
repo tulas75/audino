@@ -5,6 +5,8 @@ export interface AudioRecording {
   duration: number;
   createdAt: Date;
   uploaded: boolean;
+  transcription?: string;
+  compiledForm?: any;
 }
 
 export interface RecorderState {
