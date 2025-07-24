@@ -1,6 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { useUserProfile, useUserRecordings } from '../hooks/useUserData';
+import { useUserProfile } from '../hooks/useUserData';
 import AudioRecorder from './Audio/AudioRecorder';
 import RecordingsList from './Audio/RecordingsList';
 import FormSchemaDisplay from './FormSchemaDisplay';
@@ -9,16 +9,14 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const recordingsListRef = useRef<{ refreshRecordings: () => void }>(null);
   
-  // Fetch user profile and recordings from GraphQL
+  // Fetch user profile from GraphQL
   const { userProfile, loading: profileLoading, error: profileError } = useUserProfile();
-  const { recordings: serverRecordings, loading: recordingsLoading, error: recordingsError, refetch: refetchRecordings } = useUserRecordings();
 
   const handleRecordingSaved = () => {
-    // Refresh both local and server recordings when a new recording is saved
+    // Refresh local recordings when a new recording is saved
     if (recordingsListRef.current) {
       recordingsListRef.current.refreshRecordings();
     }
-    refetchRecordings();
   };
 
   // Display user profile data if available, fallback to auth user
@@ -43,20 +41,11 @@ const Dashboard = () => {
         </div>
       )}
 
-      {recordingsError && (
-        <div style={{ color: 'red', marginBottom: '1rem', padding: '0.5rem', border: '1px solid red', borderRadius: '4px' }}>
-          Error loading server recordings: {recordingsError.message}
-        </div>
-      )}
       
       <main>
         <FormSchemaDisplay />
         <AudioRecorder onRecordingSaved={handleRecordingSaved} />
-        <RecordingsList 
-          ref={recordingsListRef} 
-          serverRecordings={serverRecordings}
-          serverRecordingsLoading={recordingsLoading}
-        />
+        <RecordingsList ref={recordingsListRef} />
       </main>
     </div>
   );
