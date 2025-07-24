@@ -30,7 +30,7 @@ export class AuthService {
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     // For development, use mock authentication
-    if (import.meta.env.DEV) {
+    if (!import.meta.env.VITE_USE_REAL_AUTH) {
       return this.mockLogin(credentials);
     }
 
@@ -77,7 +77,7 @@ export class AuthService {
 
   async refreshToken(token: string): Promise<AuthResponse> {
     // For development, use mock refresh
-    if (import.meta.env.DEV) {
+    if (!import.meta.env.VITE_USE_REAL_AUTH) {
       return this.mockRefreshToken(token);
     }
 
@@ -112,7 +112,7 @@ export class AuthService {
 
   async validateToken(token: string): Promise<User> {
     // For development, use mock validation
-    if (import.meta.env.DEV) {
+    if (!import.meta.env.VITE_USE_REAL_AUTH) {
       return this.mockValidateToken(token);
     }
 
