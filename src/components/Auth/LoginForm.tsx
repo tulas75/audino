@@ -42,7 +42,7 @@ const LoginForm = () => {
             🎵 Audino
           </div>
           <p style={{ margin: 0, color: 'var(--gray-600)' }}>
-            AI-Powered Audio Processing
+            Audio Forms Compilation
           </p>
         </div>
         

@@ -58,7 +58,7 @@ const Dashboard = () => {
               fontSize: '0.75rem',
               fontWeight: '500'
             }}>
-              AI Audio Processing
+              Audio Forms Compilation
             </div>
           </div>
           
