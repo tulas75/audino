@@ -1,8 +1,7 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { useMutation } from '@apollo/client';
 import { AudioRecording } from '../../types/audio';
 import { ServerRecording } from '../../types/graphql';
-import { UPLOAD_AUDIO_RECORDING, DELETE_RECORDING } from '../../graphql/queries';
+import { MockGraphQLService } from '../../services/mockGraphql';
 import StorageService from '../../services/storage';
 import AudioPlayer from './AudioPlayer';
 
@@ -18,12 +17,10 @@ interface RecordingsListProps {
 const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>(({ serverRecordings = [], serverRecordingsLoading = false }, ref) => {
   const [localRecordings, setLocalRecordings] = useState<AudioRecording[]>([]);
   const [loading, setLoading] = useState(true);
+  const [uploadLoading, setUploadLoading] = useState(false);
   
   const storageService = StorageService.getInstance();
-  
-  // GraphQL mutations
-  const [uploadRecording, { loading: uploadLoading }] = useMutation(UPLOAD_AUDIO_RECORDING);
-  const [deleteServerRecording] = useMutation(DELETE_RECORDING);
+  const mockService = MockGraphQLService.getInstance();
 
   const loadLocalRecordings = async () => {
     try {
@@ -59,9 +56,14 @@ const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>(({ ser
   const handleDeleteServer = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this server recording?')) {
       try {
-        await deleteServerRecording({ variables: { id } });
-        // The parent component should refetch server recordings
-        alert('Recording deleted from server successfully!');
+        const result = await mockService.deleteRecording(id);
+        if (result.success) {
+          alert('Recording deleted from server successfully!');
+          // Trigger parent component to refetch
+          window.location.reload(); // Simple refresh for now
+        } else {
+          alert(result.message);
+        }
       } catch (error) {
         console.error('Error deleting server recording:', error);
         alert('Failed to delete recording from server.');
@@ -71,22 +73,20 @@ const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>(({ ser
 
   const handleUpload = async (recording: AudioRecording) => {
     try {
+      setUploadLoading(true);
+      
       // Convert blob to File
       const file = new File([recording.blob], `${recording.name}.webm`, {
         type: recording.blob.type,
       });
 
-      const { data } = await uploadRecording({
-        variables: {
-          input: {
-            name: recording.name,
-            duration: recording.duration,
-            audioFile: file,
-          },
-        },
+      const uploadedRecording = await mockService.uploadRecording({
+        name: recording.name,
+        duration: recording.duration,
+        audioFile: file,
       });
 
-      if (data?.uploadAudioRecording) {
+      if (uploadedRecording) {
         // Mark as uploaded in local storage
         const updatedRecording = { ...recording, uploaded: true };
         await storageService.updateRecording(updatedRecording);
@@ -98,6 +98,8 @@ const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>(({ ser
     } catch (error) {
       console.error('Error uploading recording:', error);
       alert('Failed to upload recording. Please try again.');
+    } finally {
+      setUploadLoading(false);
     }
   };
 

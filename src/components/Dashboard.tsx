@@ -3,6 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useUserProfile, useUserRecordings } from '../hooks/useUserData';
 import AudioRecorder from './Audio/AudioRecorder';
 import RecordingsList from './Audio/RecordingsList';
+import FormSchemaDisplay from './FormSchemaDisplay';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -49,6 +50,7 @@ const Dashboard = () => {
       )}
       
       <main>
+        <FormSchemaDisplay />
         <AudioRecorder onRecordingSaved={handleRecordingSaved} />
         <RecordingsList 
           ref={recordingsListRef} 
