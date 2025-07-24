@@ -1,5 +1,8 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useMutation } from '@apollo/client';
 import { AudioRecording } from '../../types/audio';
+import { ServerRecording } from '../../types/graphql';
+import { UPLOAD_AUDIO_RECORDING, DELETE_RECORDING } from '../graphql/queries';
 import StorageService from '../../services/storage';
 import AudioPlayer from './AudioPlayer';
 
@@ -7,47 +10,95 @@ export interface RecordingsListRef {
   refreshRecordings: () => void;
 }
 
-const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
-  const [recordings, setRecordings] = useState<AudioRecording[]>([]);
+interface RecordingsListProps {
+  serverRecordings?: ServerRecording[];
+  serverRecordingsLoading?: boolean;
+}
+
+const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>(({ serverRecordings = [], serverRecordingsLoading = false }, ref) => {
+  const [localRecordings, setLocalRecordings] = useState<AudioRecording[]>([]);
   const [loading, setLoading] = useState(true);
   
   const storageService = StorageService.getInstance();
+  
+  // GraphQL mutations
+  const [uploadRecording, { loading: uploadLoading }] = useMutation(UPLOAD_AUDIO_RECORDING);
+  const [deleteServerRecording] = useMutation(DELETE_RECORDING);
 
-  const loadRecordings = async () => {
+  const loadLocalRecordings = async () => {
     try {
       setLoading(true);
       const allRecordings = await storageService.getAllRecordings();
-      setRecordings(allRecordings);
+      setLocalRecordings(allRecordings);
     } catch (error) {
-      console.error('Error loading recordings:', error);
+      console.error('Error loading local recordings:', error);
     } finally {
       setLoading(false);
     }
   };
 
   useImperativeHandle(ref, () => ({
-    refreshRecordings: loadRecordings
+    refreshRecordings: loadLocalRecordings
   }));
 
   useEffect(() => {
-    loadRecordings();
+    loadLocalRecordings();
   }, []);
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this recording?')) {
+  const handleDeleteLocal = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this local recording?')) {
       try {
         await storageService.deleteRecording(id);
-        setRecordings(prev => prev.filter(r => r.id !== id));
+        setLocalRecordings(prev => prev.filter(r => r.id !== id));
       } catch (error) {
-        console.error('Error deleting recording:', error);
+        console.error('Error deleting local recording:', error);
+      }
+    }
+  };
+
+  const handleDeleteServer = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this server recording?')) {
+      try {
+        await deleteServerRecording({ variables: { id } });
+        // The parent component should refetch server recordings
+        alert('Recording deleted from server successfully!');
+      } catch (error) {
+        console.error('Error deleting server recording:', error);
+        alert('Failed to delete recording from server.');
       }
     }
   };
 
   const handleUpload = async (recording: AudioRecording) => {
-    // TODO: Implement GraphQL upload
-    console.log('Uploading recording:', recording.name);
-    alert('Upload functionality will be implemented next!');
+    try {
+      // Convert blob to File
+      const file = new File([recording.blob], `${recording.name}.webm`, {
+        type: recording.blob.type,
+      });
+
+      const { data } = await uploadRecording({
+        variables: {
+          input: {
+            name: recording.name,
+            duration: recording.duration,
+            audioFile: file,
+          },
+        },
+      });
+
+      if (data?.uploadAudioRecording) {
+        // Mark as uploaded in local storage
+        const updatedRecording = { ...recording, uploaded: true };
+        await storageService.updateRecording(updatedRecording);
+        setLocalRecordings(prev => 
+          prev.map(r => r.id === recording.id ? updatedRecording : r)
+        );
+        alert('Recording uploaded successfully!');
+      }
+    } catch (error) {
+      console.error('Error uploading recording:', error);
+      alert('Failed to upload recording. Please try again.');
+    }
   };
 
   const formatDuration = (seconds: number) => {
@@ -56,49 +107,94 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  if (loading) {
+  if (loading || serverRecordingsLoading) {
     return <div>Loading recordings...</div>;
   }
 
   return (
     <div>
-      <h3>Saved Recordings ({recordings.length})</h3>
-      
-      {recordings.length === 0 ? (
-        <p>No recordings yet. Start recording to see them here!</p>
-      ) : (
-        <div>
-          {recordings.map((recording) => (
-            <div key={recording.id} className="recording-item">
-              <div>
-                <h4>{recording.name}</h4>
-                <p>Duration: {formatDuration(recording.duration)}</p>
-                <p>Created: {recording.createdAt.toLocaleString()}</p>
-                <p>Status: {recording.uploaded ? '✅ Uploaded' : '⏳ Not uploaded'}</p>
-              </div>
-              
-              <div>
-                <AudioPlayer audioBlob={recording.blob} />
-                <div className="recording-controls" style={{ marginTop: '0.5rem' }}>
-                  <button 
-                    onClick={() => handleUpload(recording)}
-                    className="btn btn-primary"
-                    disabled={recording.uploaded}
-                  >
-                    {recording.uploaded ? 'Uploaded' : 'Upload'}
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(recording.id)}
-                    className="btn btn-danger"
-                  >
-                    Delete
-                  </button>
+      {/* Local Recordings Section */}
+      <div style={{ marginBottom: '2rem' }}>
+        <h3>Local Recordings ({localRecordings.length})</h3>
+        
+        {localRecordings.length === 0 ? (
+          <p>No local recordings yet. Start recording to see them here!</p>
+        ) : (
+          <div>
+            {localRecordings.map((recording) => (
+              <div key={recording.id} className="recording-item">
+                <div>
+                  <h4>{recording.name}</h4>
+                  <p>Duration: {formatDuration(recording.duration)}</p>
+                  <p>Created: {recording.createdAt.toLocaleString()}</p>
+                  <p>Status: {recording.uploaded ? '✅ Uploaded' : '⏳ Not uploaded'}</p>
+                </div>
+                
+                <div>
+                  <AudioPlayer audioBlob={recording.blob} />
+                  <div className="recording-controls" style={{ marginTop: '0.5rem' }}>
+                    <button 
+                      onClick={() => handleUpload(recording)}
+                      className="btn btn-primary"
+                      disabled={recording.uploaded || uploadLoading}
+                    >
+                      {uploadLoading ? 'Uploading...' : recording.uploaded ? 'Uploaded' : 'Upload'}
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteLocal(recording.id)}
+                      className="btn btn-danger"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Server Recordings Section */}
+      <div>
+        <h3>Server Recordings ({serverRecordings.length})</h3>
+        
+        {serverRecordings.length === 0 ? (
+          <p>No server recordings found.</p>
+        ) : (
+          <div>
+            {serverRecordings.map((recording) => (
+              <div key={recording.id} className="recording-item">
+                <div>
+                  <h4>{recording.name}</h4>
+                  <p>Duration: {formatDuration(recording.duration)}</p>
+                  <p>Created: {new Date(recording.createdAt).toLocaleString()}</p>
+                  <p>Status: ✅ On Server</p>
+                  {recording.uploadedAt && (
+                    <p>Uploaded: {new Date(recording.uploadedAt).toLocaleString()}</p>
+                  )}
+                </div>
+                
+                <div>
+                  {recording.fileUrl && (
+                    <audio controls style={{ marginBottom: '0.5rem' }}>
+                      <source src={recording.fileUrl} type="audio/webm" />
+                      Your browser does not support the audio element.
+                    </audio>
+                  )}
+                  <div className="recording-controls">
+                    <button 
+                      onClick={() => handleDeleteServer(recording.id)}
+                      className="btn btn-danger"
+                    >
+                      Delete from Server
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 });
