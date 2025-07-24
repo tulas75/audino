@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { AudioRecording } from '../types/audio';
 import StorageService from '../services/storage';
 
-export const useAudioRecorder = () => {
+export const useAudioRecorder = (onRecordingSaved?: () => void) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [duration, setDuration] = useState(0);
@@ -46,16 +46,29 @@ export const useAudioRecorder = () => {
 
       mediaRecorder.onstop = async () => {
         const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const finalDuration = duration; // Capture current duration
+        
         const recording: AudioRecording = {
           id: Date.now().toString(),
           name: currentRecordingNameRef.current,
           blob,
-          duration,
+          duration: finalDuration,
           createdAt: new Date(),
           uploaded: false,
         };
 
-        await storageService.saveRecording(recording);
+        try {
+          await storageService.saveRecording(recording);
+          console.log('Recording saved successfully:', recording.name);
+          
+          // Notify parent component that recording was saved
+          if (onRecordingSaved) {
+            onRecordingSaved();
+          }
+        } catch (error) {
+          console.error('Error saving recording:', error);
+          alert('Failed to save recording. Please try again.');
+        }
         
         // Clean up
         if (streamRef.current) {

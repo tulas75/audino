@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { AudioRecording } from '../../types/audio';
 import StorageService from '../../services/storage';
 import AudioPlayer from './AudioPlayer';
 
-const RecordingsList = () => {
+export interface RecordingsListRef {
+  refreshRecordings: () => void;
+}
+
+const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
   const [recordings, setRecordings] = useState<AudioRecording[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -11,6 +15,7 @@ const RecordingsList = () => {
 
   const loadRecordings = async () => {
     try {
+      setLoading(true);
       const allRecordings = await storageService.getAllRecordings();
       setRecordings(allRecordings);
     } catch (error) {
@@ -19,6 +24,10 @@ const RecordingsList = () => {
       setLoading(false);
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    refreshRecordings: loadRecordings
+  }));
 
   useEffect(() => {
     loadRecordings();
@@ -92,6 +101,8 @@ const RecordingsList = () => {
       )}
     </div>
   );
-};
+});
+
+RecordingsList.displayName = 'RecordingsList';
 
 export default RecordingsList;

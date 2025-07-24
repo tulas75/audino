@@ -1,7 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { useAudioRecorder } from '../../hooks/useAudioRecorder';
 
-const AudioRecorder = () => {
+interface AudioRecorderProps {
+  onRecordingSaved?: () => void;
+}
+
+const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingSaved }) => {
   const [recordingName, setRecordingName] = useState('');
   const { 
     isRecording, 
@@ -11,14 +15,24 @@ const AudioRecorder = () => {
     stopRecording, 
     pauseRecording, 
     resumeRecording 
-  } = useAudioRecorder();
+  } = useAudioRecorder(onRecordingSaved);
 
   const handleStartRecording = async () => {
     if (!recordingName.trim()) {
       alert('Please enter a name for the recording');
       return;
     }
-    await startRecording(recordingName);
+    try {
+      await startRecording(recordingName);
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      alert('Failed to start recording. Please check microphone permissions.');
+    }
+  };
+
+  const handleStopRecording = () => {
+    stopRecording();
+    setRecordingName(''); // Clear the input after stopping
   };
 
   const formatDuration = (seconds: number) => {
@@ -65,7 +79,7 @@ const AudioRecorder = () => {
                 Resume
               </button>
             )}
-            <button onClick={stopRecording} className="btn btn-danger">
+            <button onClick={handleStopRecording} className="btn btn-danger">
               Stop Recording
             </button>
           </>

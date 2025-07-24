@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import AudioRecorder from './Audio/AudioRecorder';
 import RecordingsList from './Audio/RecordingsList';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
+  const recordingsListRef = useRef<{ refreshRecordings: () => void }>(null);
+
+  const handleRecordingSaved = () => {
+    // Refresh the recordings list when a new recording is saved
+    if (recordingsListRef.current) {
+      recordingsListRef.current.refreshRecordings();
+    }
+  };
 
   return (
     <div className="container">
@@ -19,8 +27,8 @@ const Dashboard = () => {
       </header>
       
       <main>
-        <AudioRecorder />
-        <RecordingsList />
+        <AudioRecorder onRecordingSaved={handleRecordingSaved} />
+        <RecordingsList ref={recordingsListRef} />
       </main>
     </div>
   );
