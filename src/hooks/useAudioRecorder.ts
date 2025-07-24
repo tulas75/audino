@@ -52,7 +52,7 @@ export const useAudioRecorder = (onRecordingSaved?: () => void) => {
           id: Date.now().toString(),
           name: currentRecordingNameRef.current,
           blob,
-          duration: finalDuration,
+          duration: Math.max(finalDuration, 1), // Ensure minimum duration of 1 second
           createdAt: new Date(),
           uploaded: false,
         };

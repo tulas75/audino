@@ -39,13 +39,13 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioBlob }) => {
   };
 
   const handleTimeUpdate = () => {
-    if (audioRef.current) {
+    if (audioRef.current && !isNaN(audioRef.current.currentTime)) {
       setCurrentTime(audioRef.current.currentTime);
     }
   };
 
   const handleLoadedMetadata = () => {
-    if (audioRef.current) {
+    if (audioRef.current && !isNaN(audioRef.current.duration)) {
       setDuration(audioRef.current.duration);
     }
   };
@@ -56,6 +56,9 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioBlob }) => {
   };
 
   const formatTime = (time: number) => {
+    if (isNaN(time) || !isFinite(time)) {
+      return '00:00';
+    }
     const mins = Math.floor(time / 60);
     const secs = Math.floor(time % 60);
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
@@ -67,6 +70,8 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioBlob }) => {
         ref={audioRef}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
+        onLoadedData={handleLoadedMetadata}
+        onCanPlay={handleLoadedMetadata}
         onEnded={handleEnded}
         preload="metadata"
       />
