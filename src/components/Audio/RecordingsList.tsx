@@ -2,7 +2,7 @@ import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'rea
 import { useMutation } from '@apollo/client';
 import { AudioRecording } from '../../types/audio';
 import { ServerRecording } from '../../types/graphql';
-import { UPLOAD_AUDIO_RECORDING, DELETE_RECORDING } from '../graphql/queries';
+import { UPLOAD_AUDIO_RECORDING, DELETE_RECORDING } from '../../graphql/queries';
 import StorageService from '../../services/storage';
 import AudioPlayer from './AudioPlayer';
 
