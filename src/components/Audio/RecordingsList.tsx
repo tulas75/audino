@@ -7,6 +7,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useFormSchema } from '../../hooks/useUserData';
 import StorageService from '../../services/storage';
 import AudioPlayer from './AudioPlayer';
+import TranscriptionEditor from './TranscriptionEditor';
 
 export interface RecordingsListRef {
   refreshRecordings: () => void;
@@ -29,10 +30,59 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
       setLoading(true);
       const allRecordings = await storageService.getAllRecordings();
       setLocalRecordings(allRecordings);
+      
+      // Auto-transcribe recordings that need transcription
+      for (const recording of allRecordings) {
+        if (recording.transcribing && !recording.transcription && !recording.transcriptionError) {
+          transcribeRecording(recording);
+        }
+      }
     } catch (error) {
       console.error('Error loading local recordings:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const transcribeRecording = async (recording: AudioRecording) => {
+    if (!token) {
+      console.error('No authentication token available for transcription');
+      return;
+    }
+
+    try {
+      console.log('Starting transcription for:', recording.name);
+      
+      const transcriptionResult = import.meta.env.DEV 
+        ? await mauiService.mockTranscribeAudio(recording.blob)
+        : await mauiService.transcribeAudio(recording.blob, token);
+
+      const updatedRecording = {
+        ...recording,
+        transcribing: false,
+        transcription: transcriptionResult.transcription,
+        transcriptionError: undefined
+      };
+
+      await storageService.updateRecording(updatedRecording);
+      setLocalRecordings(prev => 
+        prev.map(r => r.id === recording.id ? updatedRecording : r)
+      );
+
+      console.log('Transcription completed for:', recording.name);
+    } catch (error) {
+      console.error('Error transcribing recording:', error);
+      
+      const updatedRecording = {
+        ...recording,
+        transcribing: false,
+        transcriptionError: error.message || 'Transcription failed'
+      };
+
+      await storageService.updateRecording(updatedRecording);
+      setLocalRecordings(prev => 
+        prev.map(r => r.id === recording.id ? updatedRecording : r)
+      );
     }
   };
 
@@ -67,26 +117,22 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
       return;
     }
 
+    if (!recording.transcription) {
+      alert('Transcription is required before processing. Please wait for transcription to complete.');
+      return;
+    }
+
     try {
       setProcessingLoading(true);
-      setProcessingStep('Transcribing audio...');
-
-      // Step 1: Transcribe audio using MAUI
-      const transcriptionResult = import.meta.env.DEV 
-        ? await mauiService.mockTranscribeAudio(recording.blob)
-        : await mauiService.transcribeAudio(recording.blob, token);
-
-      console.log('Transcription result:', transcriptionResult);
-
       setProcessingStep('Compiling form data...');
 
-      // Step 2: Send form compilation request to MAUI
+      // Send form compilation request to MAUI using existing transcription
       const compilationRequest = {
         formSchema,
         formSchemaName,
         formSchemaExampleData,
         formSchemaChoices,
-        transcribedAudio: transcriptionResult.transcription
+        transcribedAudio: recording.transcription
       };
 
       const compilationResult = import.meta.env.DEV
@@ -100,7 +146,6 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
         const updatedRecording = { 
           ...recording, 
           uploaded: true,
-          transcription: transcriptionResult.transcription,
           compiledForm: compilationResult.compiledForm
         };
         await storageService.updateRecording(updatedRecording);
@@ -109,7 +154,7 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
         );
 
         // Show results
-        alert(`Processing completed successfully!\n\nTranscription: ${transcriptionResult.transcription.substring(0, 100)}...\n\nGenerated Title: ${compilationResult.compiledForm.title}`);
+        alert(`Processing completed successfully!\n\nGenerated Title: ${compilationResult.compiledForm.title}`);
       } else {
         throw new Error('Form compilation failed');
       }
@@ -120,6 +165,40 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
       setProcessingLoading(false);
       setProcessingStep('');
     }
+  };
+
+  const handleTranscriptionUpdate = async (recordingId: string, newTranscription: string) => {
+    try {
+      const recording = localRecordings.find(r => r.id === recordingId);
+      if (!recording) return;
+
+      const updatedRecording = {
+        ...recording,
+        transcription: newTranscription
+      };
+
+      await storageService.updateRecording(updatedRecording);
+      setLocalRecordings(prev => 
+        prev.map(r => r.id === recordingId ? updatedRecording : r)
+      );
+    } catch (error) {
+      console.error('Error updating transcription:', error);
+    }
+  };
+
+  const handleRetryTranscription = async (recording: AudioRecording) => {
+    const updatedRecording = {
+      ...recording,
+      transcribing: true,
+      transcriptionError: undefined
+    };
+
+    await storageService.updateRecording(updatedRecording);
+    setLocalRecordings(prev => 
+      prev.map(r => r.id === recording.id ? updatedRecording : r)
+    );
+
+    transcribeRecording(updatedRecording);
   };
 
   const formatDuration = (seconds: number) => {
@@ -160,22 +239,56 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
                   <h4>{recording.name}</h4>
                   <p>Duration: {formatDuration(recording.duration)}</p>
                   <p>Created: {recording.createdAt.toLocaleString()}</p>
-                  <p>Status: {recording.uploaded ? '✅ Processed' : '⏳ Not processed'}</p>
+                  <p>Status: {
+                    recording.uploaded ? '✅ Processed' : 
+                    recording.transcribing ? '🔄 Transcribing...' :
+                    recording.transcriptionError ? '❌ Transcription failed' :
+                    recording.transcription ? '📝 Transcribed' : '⏳ Not processed'
+                  }</p>
+                  
+                  {/* Transcription Section */}
+                  {recording.transcribing && (
+                    <div style={{ 
+                      marginTop: '0.5rem',
+                      padding: '0.75rem',
+                      backgroundColor: '#e3f2fd',
+                      borderRadius: '4px',
+                      border: '1px solid #2196f3'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span className="loading-spinner"></span>
+                        <span>Transcribing audio...</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {recording.transcriptionError && (
+                    <div style={{ 
+                      marginTop: '0.5rem',
+                      padding: '0.75rem',
+                      backgroundColor: '#ffebee',
+                      borderRadius: '4px',
+                      border: '1px solid #f44336'
+                    }}>
+                      <div style={{ color: '#d32f2f', marginBottom: '0.5rem' }}>
+                        ❌ Transcription Error: {recording.transcriptionError}
+                      </div>
+                      <button 
+                        onClick={() => handleRetryTranscription(recording)}
+                        className="btn btn-sm btn-primary"
+                      >
+                        🔄 Retry Transcription
+                      </button>
+                    </div>
+                  )}
+
                   {recording.transcription && (
-                    <details style={{ marginTop: '0.5rem' }}>
-                      <summary style={{ cursor: 'pointer', fontWeight: 'bold' }}>
-                        📝 Transcription
-                      </summary>
-                      <p style={{ 
-                        marginTop: '0.5rem', 
-                        padding: '0.5rem', 
-                        backgroundColor: '#f8f9fa', 
-                        borderRadius: '4px',
-                        fontSize: '0.9rem'
-                      }}>
-                        {recording.transcription}
-                      </p>
-                    </details>
+                    <TranscriptionEditor
+                      recordingId={recording.id}
+                      transcription={recording.transcription}
+                      onUpdate={handleTranscriptionUpdate}
+                      disabled={recording.uploaded}
+                    />
                   )}
                   {recording.compiledForm && (
                     <details style={{ marginTop: '0.5rem' }}>
@@ -203,9 +316,13 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
                     <button 
                       onClick={() => handleProcessWithMAUI(recording)}
                       className="btn btn-primary"
-                      disabled={recording.uploaded || processingLoading}
+                      disabled={recording.uploaded || processingLoading || recording.transcribing || !recording.transcription}
                     >
-                      {processingLoading ? processingStep || 'Processing...' : recording.uploaded ? 'Processed' : 'Process with MAUI'}
+                      {processingLoading ? processingStep || 'Processing...' : 
+                       recording.uploaded ? 'Processed' : 
+                       recording.transcribing ? 'Transcribing...' :
+                       !recording.transcription ? 'Waiting for transcription' :
+                       'Process with MAUI'}
                     </button>
                     <button 
                       onClick={() => handleDeleteLocal(recording.id)}

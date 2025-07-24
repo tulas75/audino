@@ -55,6 +55,7 @@ export const useAudioRecorder = (onRecordingSaved?: () => void) => {
           duration: Math.max(finalDuration, 1), // Ensure minimum duration of 1 second
           createdAt: new Date(),
           uploaded: false,
+          transcribing: true, // Mark as transcribing
         };
 
         try {
