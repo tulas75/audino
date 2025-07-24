@@ -35,7 +35,7 @@ export class AuthService {
     }
 
     // Production API call
-    const response = await fetch(`${AUTH_API_URL}/login`, {
+    const response = await fetch(`${AUTH_API_URL}/signin/email-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
