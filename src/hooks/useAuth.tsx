@@ -40,11 +40,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (credentials: LoginCredentials) => {
     setIsLoading(true);
     try {
+      console.log('Attempting login with:', credentials.email);
       const response = await authService.login(credentials);
+      console.log('Login response:', response);
+      
+      if (!response.token || !response.user) {
+        throw new Error('Invalid response format from server');
+      }
+      
       setUser(response.user);
       setToken(response.token);
       authService.storeToken(response.token);
+      console.log('Login successful, user set:', response.user);
+      console.log('Auth state after login - user:', response.user, 'token:', response.token);
     } catch (error) {
+      console.error('Login error:', error);
       throw error;
     } finally {
       setIsLoading(false);
