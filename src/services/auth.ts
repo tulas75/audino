@@ -52,25 +52,24 @@ export class AuthService {
     const data = await response.json();
     console.log('Raw API response:', data);
 
-    // Handle different possible response formats
-    if (data.access_token || data.accessToken) {
-      // Format 1: { access_token: "...", user: {...} }
+    // Handle the actual API response format
+    if (data.session && data.session.accessToken && data.session.user) {
       return {
-        token: data.access_token || data.accessToken,
-        user: data.user || data.profile || {
-          id: data.user_id || data.userId || 'unknown',
-          email: data.email || credentials.email,
-          name: data.name || data.display_name || 'User'
+        token: data.session.accessToken,
+        user: {
+          id: data.session.user.id,
+          email: data.session.user.email,
+          name: data.session.user.displayName || data.session.user.email
         }
       };
-    } else if (data.token) {
-      // Format 2: { token: "...", user: {...} }
+    } else if (data.accessToken) {
+      // Fallback for direct accessToken format
       return {
-        token: data.token,
+        token: data.accessToken,
         user: data.user || {
-          id: data.user_id || data.userId || 'unknown',
-          email: data.email || credentials.email,
-          name: data.name || data.display_name || 'User'
+          id: data.user?.id || 'unknown',
+          email: data.user?.email || credentials.email,
+          name: data.user?.displayName || data.user?.name || 'User'
         }
       };
     } else {
