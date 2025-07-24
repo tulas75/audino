@@ -14,10 +14,13 @@ const LoginForm = () => {
     setError('');
     
     try {
+      console.log('Form submitting login...');
       await login({ email, password });
+      console.log('Login successful, navigating to dashboard...');
       navigate('/dashboard');
     } catch (err) {
-      setError('Login failed. Please check your credentials.');
+      console.error('Login form error:', err);
+      setError(err instanceof Error ? err.message : 'Login failed. Please check your credentials.');
     }
   };
 
