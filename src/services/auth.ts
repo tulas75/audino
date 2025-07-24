@@ -44,10 +44,40 @@ export class AuthService {
     });
 
     if (!response.ok) {
-      throw new Error('Login failed');
+      const errorText = await response.text();
+      console.error('Login API error:', response.status, errorText);
+      throw new Error(`Login failed: ${response.status}`);
     }
 
-    return response.json();
+    const data = await response.json();
+    console.log('Raw API response:', data);
+
+    // Handle different possible response formats
+    if (data.access_token || data.accessToken) {
+      // Format 1: { access_token: "...", user: {...} }
+      return {
+        token: data.access_token || data.accessToken,
+        user: data.user || data.profile || {
+          id: data.user_id || data.userId || 'unknown',
+          email: data.email || credentials.email,
+          name: data.name || data.display_name || 'User'
+        }
+      };
+    } else if (data.token) {
+      // Format 2: { token: "...", user: {...} }
+      return {
+        token: data.token,
+        user: data.user || {
+          id: data.user_id || data.userId || 'unknown',
+          email: data.email || credentials.email,
+          name: data.name || data.display_name || 'User'
+        }
+      };
+    } else {
+      // Log the actual response format for debugging
+      console.error('Unexpected response format:', data);
+      throw new Error('Invalid response format from server');
+    }
   }
 
   private async mockLogin(credentials: LoginCredentials): Promise<AuthResponse> {
