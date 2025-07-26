@@ -55,9 +55,10 @@ export class AuthService {
     const data = await response.json();
     console.log('Raw API response:', data);
 
+    let authResponse: AuthResponse;
     // Handle the actual API response format
     if (data.session && data.session.accessToken && data.session.user) {
-      return {
+      authResponse = {
         token: data.session.accessToken,
         user: {
           id: data.session.user.id,
@@ -67,7 +68,7 @@ export class AuthService {
       };
     } else if (data.accessToken) {
       // Fallback for direct accessToken format
-      return {
+      authResponse = {
         token: data.accessToken,
         user: data.user || {
           id: data.user?.id || 'unknown',
@@ -80,6 +81,10 @@ export class AuthService {
       console.error('Unexpected response format:', data);
       throw new Error('Invalid response format from server');
     }
+
+    this.storeToken(authResponse.token);
+    this.authenticateMAUI(authResponse.user.email).catch(console.error);
+    return authResponse;
   }
 
   private async mockLogin(credentials: LoginCredentials): Promise<AuthResponse> {
