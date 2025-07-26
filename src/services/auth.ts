@@ -281,6 +281,42 @@ export class AuthService {
     };
   }
 
+  async getTokenCount(userEmail: string): Promise<number> {
+    const mauiBaseUrl = import.meta.env.VITE_MAUI_API_URL;
+    if (!mauiBaseUrl) {
+      console.error('VITE_MAUI_API_URL is not set');
+      return 0;
+    }
+
+    const apiKey = localStorage.getItem('pandas_dino_api_key');
+    if (!apiKey) {
+      return 0;
+    }
+
+    try {
+      const response = await fetch(`${mauiBaseUrl}/getusertokens`, {
+        method: 'POST',
+        headers: {
+          'X-USER-EMAIL': userEmail,
+          'X-API-KEY': apiKey
+        }
+      });
+
+      if (response.ok) {
+        const tokens = response.headers.get('TOKENS');
+        if (tokens) {
+          return parseInt(tokens, 10);
+        }
+      } else {
+        const errorText = await response.text();
+        console.error(`Failed to get token count: ${response.status} - ${errorText}`);
+      }
+    } catch (error) {
+      console.error('Error getting token count', error);
+    }
+    return 0;
+  }
+
   storeToken(token: string): void {
     localStorage.setItem('auth_token', token);
   }
