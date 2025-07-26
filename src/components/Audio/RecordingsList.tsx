@@ -84,7 +84,7 @@ const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>(functi
       const updatedRecording = {
         ...recording,
         transcribing: false,
-        transcriptionError: error.message || 'Transcription failed'
+        transcriptionError: error instanceof Error ? error.message : 'Transcription failed'
       };
 
       await storageService.updateRecording(updatedRecording);
