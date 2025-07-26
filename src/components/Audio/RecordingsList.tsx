@@ -1,7 +1,6 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { AudioRecording } from '../../types/audio';
 import { ServerRecording } from '../../types/graphql';
-import { MockGraphQLService } from '../../services/mockGraphql';
 import { MAUIService } from '../../services/maui';
 import { useAuth } from '../../hooks/useAuth';
 import { useFormSchema } from '../../hooks/useUserData';
@@ -20,7 +19,6 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
   const [processingStep, setProcessingStep] = useState<string>('');
   
   const storageService = StorageService.getInstance();
-  const mockService = MockGraphQLService.getInstance();
   const mauiService = MAUIService.getInstance();
   const { token } = useAuth();
   const { formSchema, formSchemaName, formSchemaExampleData, formSchemaChoices } = useFormSchema();
@@ -53,12 +51,7 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
     try {
       console.log('Starting transcription for:', recording.name);
       
-      let transcriptionResult;
-      if (import.meta.env.VITE_USE_MOCK_AUDIO) {
-        transcriptionResult = await mauiService.mockTranscribeAudio(recording.blob);
-      } else {
-        transcriptionResult = await mauiService.transcribeAudio(recording.blob, token);
-      }
+      const transcriptionResult = await mauiService.transcribeAudio(recording.blob, token);
 
       const updatedRecording = {
         ...recording,
@@ -138,9 +131,7 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
         transcribedAudio: recording.transcription
       };
 
-      const compilationResult = import.meta.env.DEV
-        ? await mauiService.mockCompileAudioForm(compilationRequest)
-        : await mauiService.compileAudioForm(compilationRequest, token);
+      const compilationResult = await mauiService.compileAudioForm(compilationRequest, token);
 
       console.log('Form compilation result:', compilationResult);
 

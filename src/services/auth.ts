@@ -29,15 +29,6 @@ export class AuthService {
   }
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    // For development, use mock authentication
-    if (!import.meta.env.VITE_USE_REAL_AUTH) {
-      const response = await this.mockLogin(credentials);
-      this.storeToken(response.token);
-      this.authenticateMAUI(response.user.email).catch(console.error);
-      return response;
-    }
-
-    // Production API call
     const response = await fetch(`${AUTH_API_URL}/signin/email-password`, {
       method: 'POST',
       headers: {
@@ -90,38 +81,7 @@ export class AuthService {
     return authResponse;
   }
 
-  private async mockLogin(credentials: LoginCredentials): Promise<AuthResponse> {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    const user = MOCK_USERS.find(u => 
-      u.email === credentials.email && u.password === credentials.password
-    );
-
-    if (!user) {
-      throw new Error('Invalid credentials');
-    }
-
-    // Generate a mock JWT token
-    const token = `mock-jwt-token-${user.id}-${Date.now()}`;
-
-    return {
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name
-      }
-    };
-  }
-
   async refreshToken(token: string): Promise<AuthResponse> {
-    // For development, use mock refresh
-    if (!import.meta.env.VITE_USE_REAL_AUTH) {
-      return this.mockRefreshToken(token);
-    }
-
-    // Production API call
     const response = await fetch(`${AUTH_API_URL}/refresh`, {
       method: 'POST',
       headers: {
@@ -135,19 +95,6 @@ export class AuthService {
     }
 
     return response.json();
-  }
-
-  private async mockRefreshToken(token: string): Promise<AuthResponse> {
-    // Validate the current token first
-    const user = await this.mockValidateToken(token);
-    
-    // Generate a new mock token
-    const newToken = `mock-jwt-token-${user.id}-${Date.now()}`;
-
-    return {
-      token: newToken,
-      user
-    };
   }
 
   private async authenticateMAUI(userEmail: string): Promise<number> {
@@ -236,12 +183,6 @@ export class AuthService {
   }
 
   async validateToken(token: string): Promise<User> {
-    // For development, use mock validation
-    if (!import.meta.env.VITE_USE_REAL_AUTH) {
-      return this.mockValidateToken(token);
-    }
-
-    // Production API call
     const response = await fetch(`${AUTH_API_URL}/validate`, {
       method: 'GET',
       headers: {
@@ -254,29 +195,6 @@ export class AuthService {
     }
 
     return response.json();
-  }
-
-  private async mockValidateToken(token: string): Promise<User> {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Extract user ID from mock token
-    if (!token.startsWith('mock-jwt-token-')) {
-      throw new Error('Invalid token');
-    }
-
-    const userId = token.split('-')[3];
-    const user = MOCK_USERS.find(u => u.id === userId);
-
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name
-    };
   }
 
   async getTokenCount(userEmail: string): Promise<number> {
