@@ -55,6 +55,14 @@ const Dashboard = () => {
     }
   };
 
+  const handleTokenCountUpdate = async () => {
+    // Refresh token count after MAUI processing
+    if (user?.email) {
+      const updatedTokenCount = await AuthService.getInstance().getTokenCount(user.email);
+      setTokenCount(updatedTokenCount);
+    }
+  };
+
   const showSnackbar = (message: string, severity: SnackbarSeverity = 'info') => {
     setSnackbar({ open: true, message, severity });
   };
@@ -172,7 +180,11 @@ const Dashboard = () => {
         }}>
           <FormSchemaDisplay />
           <AudioRecorder onRecordingSaved={handleRecordingSaved} showMessage={showSnackbar} />
-          <RecordingsList ref={recordingsListRef} showMessage={showSnackbar} />
+          <RecordingsList 
+            ref={recordingsListRef} 
+            showMessage={showSnackbar} 
+            onTokenCountUpdate={handleTokenCountUpdate}
+          />
         </div>
       </main>
 

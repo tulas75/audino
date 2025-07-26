@@ -20,6 +20,7 @@ export interface RecordingsListRef {
 
 interface RecordingsListProps {
   showMessage: (message: string, severity: 'success' | 'error' | 'info' | 'warning') => void;
+  onTokenCountUpdate?: () => void;
 }
 
 const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>(function RecordingsList(props, ref) {
@@ -181,6 +182,11 @@ const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>(functi
       
       // Show success message
       props.showMessage('Processing completed successfully!', 'success');
+      
+      // Update token count in parent component
+      if (props.onTokenCountUpdate) {
+        props.onTokenCountUpdate();
+      }
     } catch (error) {
       console.error('Error processing with MAUI:', error);
       props.showMessage(`Failed to process recording: ${error.message}`, 'error');
