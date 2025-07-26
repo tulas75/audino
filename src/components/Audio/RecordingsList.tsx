@@ -134,15 +134,16 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
       const mockFormSchemaExampleData = MOCK_FORM_SCHEMA_EXAMPLE_DATA;
       const mockFormSchemaChoices = MOCK_FORM_SCHEMA_CHOICES;
 
-      // Create FormData object
-      const formData = new FormData();
-      formData.append('name', mockFormSchemaName);
-      formData.append('schema', JSON.stringify(mockFormSchema));
-      formData.append('exampledata', JSON.stringify(mockFormSchemaExampleData));
-      formData.append('choices', JSON.stringify(mockFormSchemaChoices));
-      formData.append('transcribedAudio', recording.transcription);
+      // Create JSON object with required fields
+      const jsonRequest = {
+        name: mockFormSchemaName,
+        schema: mockFormSchema,
+        exampledata: mockFormSchemaExampleData,
+        choices: mockFormSchemaChoices,
+        transcribedAudio: recording.transcription
+      };
 
-      const compilationResult = await mauiService.compileAudioForm(formData);
+      const compilationResult = await mauiService.compileAudioForm(jsonRequest);
 
       console.log('Form compilation result:', compilationResult);
 

@@ -71,7 +71,7 @@ export class MAUIService {
   }
 
   async compileAudioForm(
-    formData: FormData
+    request: any
   ): Promise<MAUIFormCompilationResponse> {
     // Get API key and user email from localStorage
     const apiKey = localStorage.getItem('pandas_dino_api_key') || '';
@@ -81,9 +81,10 @@ export class MAUIService {
       method: 'POST',
       headers: {
         'X-API-KEY': apiKey,
-        'X-USER-EMAIL': userEmail
+        'X-USER-EMAIL': userEmail,
+        'Content-Type': 'application/json'
       },
-      body: formData,
+      body: JSON.stringify(request),
     });
 
     if (!response.ok) {
