@@ -188,7 +188,7 @@ const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>(functi
       }
     } catch (error) {
       console.error('Error processing with MAUI:', error);
-      props.showMessage(`Failed to process recording: ${error.message}`, 'error');
+      props.showMessage(`Failed to process recording: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
     } finally {
       setProcessingLoading(false);
       setProcessingStep('');
