@@ -83,6 +83,7 @@ export class AuthService {
     }
 
     this.storeToken(authResponse.token);
+    this.storeUserEmail(authResponse.user.email);
     const tokenCount = await this.authenticateMAUI(authResponse.user.email);
     // Dispatch event to update UI regardless of token count
     document.dispatchEvent(new CustomEvent('tokenCountUpdate', { detail: tokenCount }));
@@ -318,6 +319,10 @@ export class AuthService {
 
   storeToken(token: string): void {
     localStorage.setItem('auth_token', token);
+  }
+
+  storeUserEmail(email: string): void {
+    localStorage.setItem('auth_user_email', email);
   }
 
   getStoredToken(): string | null {

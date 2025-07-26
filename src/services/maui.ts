@@ -48,12 +48,19 @@ export class MAUIService {
   async transcribeAudio(audioBlob: Blob, token: string): Promise<MAUITranscriptionResponse> {
     const formData = new FormData();
     formData.append('audio', audioBlob, 'recording.webm');
+    formData.append('lang', 'ITA');
+
+    // Get API key and user email from localStorage
+    const apiKey = localStorage.getItem('pandas_dino_api_key') || '';
+    const userEmail = localStorage.getItem('auth_user_email') || '';
 
     const response = await fetch(`${this.baseUrl}/transcribe`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'X-API-Key': this.apiKey,
+        'X-API-KEY': apiKey,
+        'X-USER-EMAIL': userEmail,
+        'X-USER-NAME': 'admin gnucoop'
       },
       body: formData,
     });
