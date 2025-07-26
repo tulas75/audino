@@ -198,11 +198,16 @@ export class AuthService {
 
         if (response.ok) {
           const data = await response.json();
+          console.log('Response from /checkpandinouser:', data);
           if (data.api_key) {
             localStorage.setItem('pandas_dino_api_key', data.api_key);
+            console.log('Saved pandas_dino_api_key in localStorage');
+          } else {
+            console.warn('Response did not contain api_key property');
           }
         } else {
-          console.error('Failed to check pandas dino user');
+          const errorText = await response.text();
+          console.error(`Failed to check pandas dino user: ${response.status} - ${errorText}`);
         }
       } catch (error) {
         console.error('Error during POST to MAUI /checkpandinouser', error);
