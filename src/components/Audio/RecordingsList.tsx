@@ -63,7 +63,7 @@ const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>(functi
     try {
       console.log('Starting transcription for:', recording.name);
       
-      const transcriptionResult = await mauiService.transcribeAudio(recording.blob, token);
+      const transcriptionResult = await mauiService.transcribeAudio(recording.blob);
 
       const updatedRecording = {
         ...recording,

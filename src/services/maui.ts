@@ -17,11 +17,10 @@ export type MAUIFormCompilationResponse = any[];
 export class MAUIService {
   private static instance: MAUIService;
   private baseUrl: string;
-  private apiKey: string;
+  //private apiKey: string;
 
   private constructor() {
     this.baseUrl = import.meta.env.VITE_MAUI_API_URL || 'https://api.maui.com';
-    this.apiKey = import.meta.env.VITE_MAUI_API_KEY || '';
   }
 
   static getInstance(): MAUIService {
@@ -31,15 +30,15 @@ export class MAUIService {
     return MAUIService.instance;
   }
 
-  private getAuthHeaders(token: string) {
+  /*private getAuthHeaders(token: string) {
     return {
       'Authorization': `Bearer ${token}`,
       'X-API-Key': this.apiKey,
       'Content-Type': 'application/json',
     };
-  }
+  }*/
 
-  async transcribeAudio(audioBlob: Blob, token: string): Promise<MAUITranscriptionResponse> {
+  async transcribeAudio(audioBlob: Blob): Promise<MAUITranscriptionResponse> {
     const formData = new FormData();
     formData.append('file', audioBlob, 'recording.webm');
     formData.append('lang', 'ITA');

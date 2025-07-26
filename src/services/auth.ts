@@ -2,22 +2,6 @@ import { LoginCredentials, AuthResponse, User } from '../types/auth';
 
 const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL || 'http://localhost:3001/auth';
 
-// Mock users for development
-const MOCK_USERS = [
-  {
-    id: '1',
-    email: 'demo@example.com',
-    name: 'Demo User',
-    password: 'demo123'
-  },
-  {
-    id: '2',
-    email: 'test@test.com',
-    name: 'Test User',
-    password: 'test123'
-  }
-];
-
 export class AuthService {
   private static instance: AuthService;
   
