@@ -1,6 +1,5 @@
 export interface MAUITranscriptionResponse {
-  transcription: string;
-  confidence: number;
+  text: string;
   duration: number;
   language?: string;
 }

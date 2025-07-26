@@ -56,7 +56,7 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
       const updatedRecording = {
         ...recording,
         transcribing: false,
-        transcription: transcriptionResult.transcription,
+        transcription: transcriptionResult.text,
         transcriptionError: undefined
       };
 
