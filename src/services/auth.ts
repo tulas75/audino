@@ -162,12 +162,24 @@ export class AuthService {
       url.searchParams.append('user_email', userEmail);
 
       try {
-        const response = await fetch(url.toString());
+        const response = await fetch(`${mauiBaseUrl}/getusertoken`, {
+          method: 'GET',
+          headers: {
+            'X-USER-EMAIL': userEmail,
+            'X-API-KEY': apiKey
+          }
+        });
+
         if (response.ok) {
+          const data = await response.json();
+          console.log('Response from /getusertoken:', data);
           const tokens = response.headers.get('TOKENS');
-          console.log(`TOKENS: ${tokens}`);
+          if (tokens) {
+            console.log(`TOKENS: ${tokens}`);
+          }
         } else {
-          console.error('Failed to get user token from MAUI');
+          const errorText = await response.text();
+          console.error(`Failed to get user token from MAUI: ${response.status} - ${errorText}`);
         }
       } catch (error) {
         console.error('Error during GET to MAUI /getusertoken', error);
