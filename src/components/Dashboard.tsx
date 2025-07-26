@@ -4,6 +4,7 @@ import { useUserProfile } from '../hooks/useUserData';
 import AudioRecorder from './Audio/AudioRecorder';
 import RecordingsList from './Audio/RecordingsList';
 import FormSchemaDisplay from './FormSchemaDisplay';
+import { AuthService } from '../services/auth';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -14,6 +15,15 @@ const Dashboard = () => {
   const { userProfile, loading: profileLoading, error: profileError } = useUserProfile();
 
   useEffect(() => {
+    const fetchTokenCount = async () => {
+      if (user?.email) {
+        const tokenCount = await AuthService.getInstance().getTokenCount(user.email);
+        setTokenCount(tokenCount);
+      }
+    };
+
+    fetchTokenCount();
+
     const handleTokenCountUpdate = (event: CustomEvent) => {
       setTokenCount(event.detail);
     };
@@ -23,7 +33,7 @@ const Dashboard = () => {
     return () => {
       document.removeEventListener('tokenCountUpdate', handleTokenCountUpdate as EventListener);
     };
-  }, []);
+  }, [user]);
 
   const handleRecordingSaved = () => {
     // Refresh local recordings when a new recording is saved
