@@ -12,12 +12,7 @@ export interface MAUIFormCompilationRequest {
   transcribedAudio: string;
 }
 
-export interface MAUIFormCompilationResponse {
-  success: boolean;
-  compiledForm: any;
-  suggestions?: any;
-  errors?: string[];
-}
+export type MAUIFormCompilationResponse = any[];
 
 export class MAUIService {
   private static instance: MAUIService;

@@ -147,12 +147,12 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
 
       console.log('Form compilation result:', compilationResult);
 
-      if (compilationResult.success) {
+      if (Array.isArray(compilationResult) {
         // Mark as processed in local storage
         const updatedRecording = { 
           ...recording, 
           uploaded: true,
-          compiledForm: compilationResult.compiledForm
+          compiledForm: compilationResult
         };
         await storageService.updateRecording(updatedRecording);
         setLocalRecordings(prev => 
@@ -160,9 +160,9 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
         );
 
         // Show results
-        alert(`Processing completed successfully!\n\nGenerated Title: ${compilationResult.compiledForm.title}`);
+        alert(`Processing completed successfully!`);
       } else {
-        throw new Error('Form compilation failed');
+        throw new Error('Form compilation failed - invalid response format');
       }
     } catch (error) {
       console.error('Error processing with MAUI:', error);
