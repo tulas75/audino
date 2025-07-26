@@ -47,7 +47,7 @@ export class MAUIService {
 
   async transcribeAudio(audioBlob: Blob, token: string): Promise<MAUITranscriptionResponse> {
     const formData = new FormData();
-    formData.append('audio', audioBlob, 'recording.webm');
+    formData.append('file', audioBlob, 'recording.webm');
     formData.append('lang', 'ITA');
 
     // Get API key and user email from localStorage
@@ -57,7 +57,6 @@ export class MAUIService {
     const response = await fetch(`${this.baseUrl}/transcribe`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'X-API-KEY': apiKey,
         'X-USER-EMAIL': userEmail,
         'X-USER-NAME': 'admin gnucoop'
