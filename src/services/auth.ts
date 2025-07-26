@@ -191,7 +191,7 @@ export class AuthService {
           method: 'POST',
           headers: {
             'X-USER-EMAIL': userEmail,
-            'X-AUTH-TOKE': token,
+            'X-AUTH-TOKEN': token,
             'X-GRAPHQL-URL': graphqlEndpoint
           }
         });
