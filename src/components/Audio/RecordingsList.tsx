@@ -136,9 +136,9 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
 
       // Create FormData object
       const formData = new FormData();
-      formData.append('formSchemaName', mockFormSchemaName);
-      formData.append('formSchema', JSON.stringify(mockFormSchema));
-      formData.append('exampleData', JSON.stringify(mockFormSchemaExampleData));
+      formData.append('name', mockFormSchemaName);
+      formData.append('schema', JSON.stringify(mockFormSchema));
+      formData.append('exampledata', JSON.stringify(mockFormSchemaExampleData));
       formData.append('choices', JSON.stringify(mockFormSchemaChoices));
       formData.append('transcribedAudio', recording.transcription);
 
