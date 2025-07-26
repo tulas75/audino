@@ -1,71 +1,509 @@
 import { UserProfile, ServerRecording } from '../types/graphql';
 
 // Mock form schema data
-export const MOCK_FORM_SCHEMA = {
-  type: "object",
-  properties: {
-    title: {
-      type: "string",
-      title: "Recording Title",
-      description: "Enter a descriptive title for your audio recording"
-    },
-    description: {
-      type: "string",
-      title: "Description",
-      description: "Optional description of the recording content"
-    },
-    category: {
-      type: "string",
-      title: "Category",
-      enum: ["interview", "meeting", "lecture", "music", "other"],
-      enumNames: ["Interview", "Meeting", "Lecture", "Music", "Other"]
-    },
-    tags: {
-      type: "array",
-      title: "Tags",
-      items: {
-        type: "string"
+export const MOCK_FORM_SCHEMA = [ {
+
+    "id": 1,
+    "name": "new_slide_1",
+    "label": "New Slide 1",
+    "nodes": [
+      {
+        "id": 1001,
+        "hint": null,
+        "name": "case_name",
+        "size": "normal",
+        "label": "nome paziente",
+        "parent": 1,
+        "warning": {
+          "conditions": []
+        },
+        "editable": false,
+        "nodeType": 0,
+        "fieldType": 1,
+        "parentNode": 0,
+        "validation": {
+          "conditions": []
+        },
+        "visibility": {
+          "condition": "true"
+        },
+        "description": null,
+        "defaultValue": null,
+        "conditionalBranches": [
+          {
+            "condition": "true"
+          }
+        ]
       },
-      description: "Add tags to categorize your recording"
+      {
+        "id": 1002,
+        "hint": null,
+        "name": "new_field_2",
+        "size": "normal",
+        "label": "età",
+        "parent": 1001,
+        "warning": {
+          "conditions": []
+        },
+        "editable": true,
+        "nodeType": 0,
+        "fieldType": 2,
+        "parentNode": 0,
+        "validation": {
+          "conditions": []
+        },
+        "visibility": {
+          "condition": "true"
+        },
+        "description": null,
+        "defaultValue": null,
+        "conditionalBranches": [
+          {
+            "condition": "true"
+          }
+        ]
+      },
+      {
+        "id": 1003,
+        "hint": null,
+        "name": "new_field_4",
+        "size": "normal",
+        "label": "migrante",
+        "parent": 1002,
+        "warning": {
+          "conditions": []
+        },
+        "editable": true,
+        "nodeType": 0,
+        "fieldType": 3,
+        "parentNode": 0,
+        "validation": {
+          "conditions": []
+        },
+        "visibility": {
+          "condition": "true"
+        },
+        "description": null,
+        "defaultValue": null,
+        "conditionalBranches": [
+          {
+            "condition": "true"
+          }
+        ]
+      },
+      {
+        "id": 1004,
+        "hint": null,
+        "name": "new_field_3",
+        "size": "normal",
+        "label": "problemi",
+        "parent": 1003,
+        "warning": {
+          "conditions": []
+        },
+        "editable": true,
+        "nodeType": 0,
+        "fieldType": 5,
+        "parentNode": 0,
+        "validation": {
+          "conditions": []
+        },
+        "visibility": {
+          "condition": "true"
+        },
+        "description": null,
+        "forceNarrow": false,
+        "defaultValue": null,
+        "forceExpanded": false,
+        "choicesOriginRef": "probl",
+        "triggerConditions": [],
+        "conditionalBranches": [
+          {
+            "condition": "true"
+          }
+        ]
+      },
+      {
+        "id": 1005,
+        "hint": null,
+        "name": "new_field_1",
+        "size": "normal",
+        "label": "Commenti",
+        "parent": 1004,
+        "warning": {
+          "conditions": []
+        },
+        "editable": true,
+        "nodeType": 0,
+        "fieldType": 1,
+        "parentNode": 0,
+        "validation": {
+          "conditions": []
+        },
+        "visibility": {
+          "condition": "true"
+        },
+        "description": null,
+        "defaultValue": null,
+        "conditionalBranches": [
+          {
+            "condition": "true"
+          }
+        ]
+      }
+    ],
+    "parent": 0,
+    "nodeType": 3,
+    "readonly": {
+      "condition": "false"
     },
-    isPublic: {
-      type: "boolean",
-      title: "Make Public",
-      description: "Allow others to access this recording"
+    "parentNode": 0,
+    "visibility": {
+      "condition": "true"
     },
-    transcriptionEnabled: {
-      type: "boolean",
-      title: "Enable Transcription",
-      description: "Automatically transcribe audio to text"
-    }
-  },
-  required: ["title", "category"]
-};
+    "conditionalBranches": [
+      {
+        "condition": "true"
+      }
+    ]
+}
+];
 
 export const MOCK_FORM_SCHEMA_NAME = "audio";
 
-export const MOCK_FORM_SCHEMA_EXAMPLE_DATA = {
-  title: "Team Meeting - Project Update",
-  description: "Weekly team sync discussing project milestones and upcoming deadlines",
-  category: "meeting",
-  tags: ["team", "project", "weekly-sync"],
-  isPublic: false,
-  transcriptionEnabled: true
-};
+export const MOCK_FORM_SCHEMA_EXAMPLE_DATA = [ {
+    "id": 1,
+    "name": "new_slide_1",
+    "label": "New Slide 1",
+    "nodes": [
+      {
+        "id": 1001,
+        "hint": null,
+        "name": "case_name",
+        "size": "normal",
+        "label": "nome paziente",
+        "parent": 1,
+        "warning": {
+          "conditions": []
+        },
+        "editable": false,
+        "nodeType": 0,
+        "fieldType": 1,
+        "parentNode": 0,
+        "validation": {
+          "conditions": []
+        },
+        "visibility": {
+          "condition": "true"
+        },
+        "description": null,
+        "defaultValue": null,
+        "conditionalBranches": [
+          {
+            "condition": "true"
+          }
+        ]
+      },
+      {
+        "id": 1002,
+        "hint": null,
+        "name": "new_field_2",
+        "size": "normal",
+        "label": "età",
+        "parent": 1001,
+        "warning": {
+          "conditions": []
+        },
+        "editable": true,
+        "nodeType": 0,
+        "fieldType": 2,
+        "parentNode": 0,
+        "validation": {
+          "conditions": []
+        },
+        "visibility": {
+          "condition": "true"
+        },
+        "description": null,
+        "defaultValue": null,
+        "conditionalBranches": [
+          {
+            "condition": "true"
+          }
+        ]
+      },
+      {
+        "id": 1003,
+        "hint": null,
+        "name": "new_field_4",
+        "size": "normal",
+        "label": "migrante",
+        "parent": 1002,
+        "warning": {
+          "conditions": []
+        },
+        "editable": true,
+        "nodeType": 0,
+        "fieldType": 3,
+        "parentNode": 0,
+        "validation": {
+          "conditions": []
+        },
+        "visibility": {
+          "condition": "true"
+        },
+        "description": null,
+        "defaultValue": null,
+        "conditionalBranches": [
+          {
+            "condition": "true"
+          }
+        ]
+      },
+      {
+        "id": 1004,
+        "hint": null,
+        "name": "new_field_3",
+        "size": "normal",
+        "label": "problemi",
+        "parent": 1003,
+        "warning": {
+          "conditions": []
+        },
+        "editable": true,
+        "nodeType": 0,
+        "fieldType": 5,
+        "parentNode": 0,
+        "validation": {
+          "conditions": []
+        },
+        "visibility": {
+          "condition": "true"
+        },
+        "description": null,
+        "forceNarrow": false,
+        "defaultValue": null,
+        "forceExpanded": false,
+        "choicesOriginRef": "probl",
+        "triggerConditions": [],
+        "conditionalBranches": [
+          {
+            "condition": "true"
+          }
+        ]
+      },
+      {
+        "id": 1005,
+        "hint": null,
+        "name": "new_field_1",
+        "size": "normal",
+        "label": "Commenti",
+        "parent": 1004,
+        "warning": {
+          "conditions": []
+        },
+        "editable": true,
+        "nodeType": 0,
+        "fieldType": 1,
+        "parentNode": 0,
+        "validation": {
+          "conditions": []
+        },
+        "visibility": {
+          "condition": "true"
+        },
+        "description": null,
+        "defaultValue": null,
+        "conditionalBranches": [
+          {
+            "condition": "true"
+          }
+        ]
+      }
+    ],
+    "parent": 0,
+    "nodeType": 3,
+    "readonly": {
+      "condition": "false"
+    },
+    "parentNode": 0,
+    "visibility": {
+      "condition": "true"
+    },
+    "conditionalBranches": [
+      {
+        "condition": "true"
+      }
+    ]
+}
+];
 
-export const MOCK_FORM_SCHEMA_CHOICES = {
-  category: [
-    { value: "interview", label: "Interview", description: "One-on-one or group interviews" },
-    { value: "meeting", label: "Meeting", description: "Business meetings and conferences" },
-    { value: "lecture", label: "Lecture", description: "Educational content and presentations" },
-    { value: "music", label: "Music", description: "Musical recordings and performances" },
-    { value: "other", label: "Other", description: "General audio recordings" }
-  ],
-  commonTags: [
-    "important", "urgent", "follow-up", "action-items", "decision",
-    "brainstorming", "planning", "review", "training", "demo"
-  ]
-};
+export const MOCK_FORM_SCHEMA_CHOICES = [ {
+    "id": 1,
+    "name": "new_slide_1",
+    "label": "New Slide 1",
+    "nodes": [
+      {
+        "id": 1001,
+        "hint": null,
+        "name": "case_name",
+        "size": "normal",
+        "label": "nome paziente",
+        "parent": 1,
+        "warning": {
+          "conditions": []
+        },
+        "editable": false,
+        "nodeType": 0,
+        "fieldType": 1,
+        "parentNode": 0,
+        "validation": {
+          "conditions": []
+        },
+        "visibility": {
+          "condition": "true"
+        },
+        "description": null,
+        "defaultValue": null,
+        "conditionalBranches": [
+          {
+            "condition": "true"
+          }
+        ]
+      },
+      {
+        "id": 1002,
+        "hint": null,
+        "name": "new_field_2",
+        "size": "normal",
+        "label": "età",
+        "parent": 1001,
+        "warning": {
+          "conditions": []
+        },
+        "editable": true,
+        "nodeType": 0,
+        "fieldType": 2,
+        "parentNode": 0,
+        "validation": {
+          "conditions": []
+        },
+        "visibility": {
+          "condition": "true"
+        },
+        "description": null,
+        "defaultValue": null,
+        "conditionalBranches": [
+          {
+            "condition": "true"
+          }
+        ]
+      },
+      {
+        "id": 1003,
+        "hint": null,
+        "name": "new_field_4",
+        "size": "normal",
+        "label": "migrante",
+        "parent": 1002,
+        "warning": {
+          "conditions": []
+        },
+        "editable": true,
+        "nodeType": 0,
+        "fieldType": 3,
+        "parentNode": 0,
+        "validation": {
+          "conditions": []
+        },
+        "visibility": {
+          "condition": "true"
+        },
+        "description": null,
+        "defaultValue": null,
+        "conditionalBranches": [
+          {
+            "condition": "true"
+          }
+        ]
+      },
+      {
+        "id": 1004,
+        "hint": null,
+        "name": "new_field_3",
+        "size": "normal",
+        "label": "problemi",
+        "parent": 1003,
+        "warning": {
+          "conditions": []
+        },
+        "editable": true,
+        "nodeType": 0,
+        "fieldType": 5,
+        "parentNode": 0,
+        "validation": {
+          "conditions": []
+        },
+        "visibility": {
+          "condition": "true"
+        },
+        "description": null,
+        "forceNarrow": false,
+        "defaultValue": null,
+        "forceExpanded": false,
+        "choicesOriginRef": "probl",
+        "triggerConditions": [],
+        "conditionalBranches": [
+          {
+            "condition": "true"
+          }
+        ]
+      },
+      {
+        "id": 1005,
+        "hint": null,
+        "name": "new_field_1",
+        "size": "normal",
+        "label": "Commenti",
+        "parent": 1004,
+        "warning": {
+          "conditions": []
+        },
+        "editable": true,
+        "nodeType": 0,
+        "fieldType": 1,
+        "parentNode": 0,
+        "validation": {
+          "conditions": []
+        },
+        "visibility": {
+          "condition": "true"
+        },
+        "description": null,
+        "defaultValue": null,
+        "conditionalBranches": [
+          {
+            "condition": "true"
+          }
+        ]
+      }
+    ],
+    "parent": 0,
+    "nodeType": 3,
+    "readonly": {
+      "condition": "false"
+    },
+    "parentNode": 0,
+    "visibility": {
+      "condition": "true"
+    },
+    "conditionalBranches": [
+      {
+        "condition": "true"
+      }
+    ]
+}
+];
 
 // Mock user profile
 export const MOCK_USER_PROFILE: UserProfile = {
