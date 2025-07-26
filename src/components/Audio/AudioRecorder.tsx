@@ -19,7 +19,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingSaved }) => {
 
   const handleStartRecording = async () => {
     if (!recordingName.trim()) {
-      alert('Please enter a name for the recording');
+      props.showMessage('Please enter a name for the recording', 'warning');
       return;
     }
     try {
