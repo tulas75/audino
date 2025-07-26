@@ -171,7 +171,7 @@ const Dashboard = () => {
           margin: '0 auto'
         }}>
           <FormSchemaDisplay />
-          <AudioRecorder onRecordingSaved={handleRecordingSaved} />
+          <AudioRecorder onRecordingSaved={handleRecordingSaved} showMessage={showSnackbar} />
           <RecordingsList ref={recordingsListRef} showMessage={showSnackbar} />
         </div>
       </main>
