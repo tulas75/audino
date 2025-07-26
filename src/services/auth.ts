@@ -156,14 +156,14 @@ export class AuthService {
 
     const apiKey = localStorage.getItem('pandas_dino_api_key');
     if (apiKey) {
-      // GET call to /getusertoken
-      const url = new URL(`${mauiBaseUrl}/getusertoken`);
+      // GET call to /getusertokens
+      const url = new URL(`${mauiBaseUrl}/getusertokens`);
       url.searchParams.append('api_key', apiKey);
       url.searchParams.append('user_email', userEmail);
 
       try {
-        const response = await fetch(`${mauiBaseUrl}/getusertoken`, {
-          method: 'GET',
+        const response = await fetch(`${mauiBaseUrl}/getusertokens`, {
+          method: 'POST',
           headers: {
             'X-USER-EMAIL': userEmail,
             'X-API-KEY': apiKey
@@ -172,7 +172,7 @@ export class AuthService {
 
         if (response.ok) {
           const data = await response.json();
-          console.log('Response from /getusertoken:', data);
+          console.log('Response from /getusertokens:', data);
           const tokens = response.headers.get('TOKENS');
           if (tokens) {
             console.log(`TOKENS: ${tokens}`);
@@ -182,7 +182,7 @@ export class AuthService {
           console.error(`Failed to get user token from MAUI: ${response.status} - ${errorText}`);
         }
       } catch (error) {
-        console.error('Error during GET to MAUI /getusertoken', error);
+        console.error('Error during POST to MAUI /getusertokens', error);
       }
     } else {
       // POST call to /checkpandinouser
