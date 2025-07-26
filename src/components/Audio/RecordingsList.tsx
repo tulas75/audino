@@ -122,16 +122,39 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
       setProcessingLoading(true);
       setProcessingStep('Compiling form data...');
 
-      // Send form compilation request to MAUI using existing transcription
-      const compilationRequest = {
-        formSchema,
-        formSchemaName,
-        formSchemaExampleData,
-        formSchemaChoices,
-        transcribedAudio: recording.transcription
+      // Mock data for form schema
+      const mockFormSchemaName = "Example Form";
+      const mockFormSchema = {
+        "title": "Example Form",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "age": {
+            "type": "number",
+            "title": "Age"
+          }
+        }
+      };
+      const mockFormSchemaExampleData = {
+        "name": "John Doe",
+        "age": 30
+      };
+      const mockFormSchemaChoices = {
+        "countries": ["USA", "Canada", "Mexico"]
       };
 
-      const compilationResult = await mauiService.compileAudioForm(compilationRequest, token);
+      // Create FormData object
+      const formData = new FormData();
+      formData.append('formSchemaName', mockFormSchemaName);
+      formData.append('formSchema', JSON.stringify(mockFormSchema));
+      formData.append('exampleData', JSON.stringify(mockFormSchemaExampleData));
+      formData.append('choices', JSON.stringify(mockFormSchemaChoices));
+      formData.append('transcribedAudio', recording.transcription);
+
+      const compilationResult = await mauiService.compileAudioForm(formData);
 
       console.log('Form compilation result:', compilationResult);
 

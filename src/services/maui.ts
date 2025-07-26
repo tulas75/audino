@@ -71,13 +71,19 @@ export class MAUIService {
   }
 
   async compileAudioForm(
-    request: MAUIFormCompilationRequest,
-    token: string
+    formData: FormData
   ): Promise<MAUIFormCompilationResponse> {
+    // Get API key and user email from localStorage
+    const apiKey = localStorage.getItem('pandas_dino_api_key') || '';
+    const userEmail = localStorage.getItem('auth_user_email') || '';
+
     const response = await fetch(`${this.baseUrl}/audioformcompilation`, {
       method: 'POST',
-      headers: this.getAuthHeaders(token),
-      body: JSON.stringify(request),
+      headers: {
+        'X-API-KEY': apiKey,
+        'X-USER-EMAIL': userEmail
+      },
+      body: formData,
     });
 
     if (!response.ok) {
