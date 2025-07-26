@@ -444,12 +444,14 @@ const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>(functi
                   transition: 'all 0.2s ease',
                 }}
                 onMouseOver={(e) => {
-                  e.target.style.backgroundColor = '#6c757d';
-                  e.target.style.color = 'white';
+                  const target = e.target as HTMLButtonElement;
+                  target.style.backgroundColor = '#6c757d';
+                  target.style.color = 'white';
                 }}
                 onMouseOut={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                  e.target.style.color = '#6c757d';
+                  const target = e.target as HTMLButtonElement;
+                  target.style.backgroundColor = 'transparent';
+                  target.style.color = '#6c757d';
                 }}
               >
                 Cancel
@@ -469,12 +471,14 @@ const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>(functi
                   transition: 'all 0.2s ease',
                 }}
                 onMouseOver={(e) => {
-                  e.target.style.backgroundColor = '#c82333';
-                  e.target.style.borderColor = '#c82333';
+                  const target = e.target as HTMLButtonElement;
+                  target.style.backgroundColor = '#c82333';
+                  target.style.borderColor = '#c82333';
                 }}
                 onMouseOut={(e) => {
-                  e.target.style.backgroundColor = '#dc3545';
-                  e.target.style.borderColor = '#dc3545';
+                  const target = e.target as HTMLButtonElement;
+                  target.style.backgroundColor = '#dc3545';
+                  target.style.borderColor = '#dc3545';
                 }}
               >
                 Delete
