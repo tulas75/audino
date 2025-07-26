@@ -31,7 +31,10 @@ export class AuthService {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     // For development, use mock authentication
     if (!import.meta.env.VITE_USE_REAL_AUTH) {
-      return this.mockLogin(credentials);
+      const response = await this.mockLogin(credentials);
+      this.storeToken(response.token);
+      this.authenticateMAUI(response.user.email).catch(console.error);
+      return response;
     }
 
     // Production API call
@@ -137,6 +140,69 @@ export class AuthService {
       token: newToken,
       user
     };
+  }
+
+  private async authenticateMAUI(userEmail: string): Promise<void> {
+    const mauiBaseUrl = import.meta.env.VITE_MAUI_API_URL;
+    if (!mauiBaseUrl) {
+      console.error('VITE_MAUI_API_URL is not set');
+      return;
+    }
+
+    const apiKey = localStorage.getItem('pandas_dino_api_key');
+    if (apiKey) {
+      // GET call to /getusertoken
+      const url = new URL(`${mauiBaseUrl}/getusertoken`);
+      url.searchParams.append('api_key', apiKey);
+      url.searchParams.append('user_email', userEmail);
+
+      try {
+        const response = await fetch(url.toString());
+        if (response.ok) {
+          const tokens = response.headers.get('TOKENS');
+          console.log(`TOKENS: ${tokens}`);
+        } else {
+          console.error('Failed to get user token from MAUI');
+        }
+      } catch (error) {
+        console.error('Error during GET to MAUI /getusertoken', error);
+      }
+    } else {
+      // POST call to /checkpandinouser
+      const token = this.getStoredToken();
+      if (!token) {
+        console.error('No auth token available');
+        return;
+      }
+
+      const graphqlEndpoint = import.meta.env.VITE_GRAPHQL_ENDPOINT;
+      if (!graphqlEndpoint) {
+        console.error('VITE_GRAPHQL_ENDPOINT is not set');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${mauiBaseUrl}/checkpandinouser`, {
+          method: 'POST',
+          headers: {
+            'X-USER-EMAIL': userEmail,
+            'X-AUTH-TOKE': token,
+            'X-GRAPHQL-URL': graphqlEndpoint
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.api_key) {
+            localStorage.setItem('pandas_dino_api_key', data.api_key);
+          }
+        } else {
+          console.error('Failed to check pandas dino user');
+        }
+      } catch (error) {
+        console.error('Error during POST to MAUI /checkpandinouser', error);
+      }
+    }
   }
 
   async validateToken(token: string): Promise<User> {
