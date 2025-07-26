@@ -105,9 +105,6 @@ const LoginForm = () => {
             borderRadius: 'var(--radius-md)',
             fontSize: '0.875rem'
           }}>
-            <p style={{ margin: '0 0 0.5rem 0', fontWeight: '500' }}>Demo Credentials:</p>
-            <p style={{ margin: '0 0 0.25rem 0' }}>📧 demo@example.com</p>
-            <p style={{ margin: 0 }}>🔑 demo123</p>
           </div>
         </div>
       </div>
