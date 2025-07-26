@@ -122,6 +122,10 @@ export class AuthService {
           if (typeof data.tokens === 'number') {
             return data.tokens;
           }
+          // Check if tokens are nested under response property
+          if (data.response && typeof data.response.tokens === 'number') {
+            return data.response.tokens;
+          }
         } else {
           const errorText = await response.text();
           console.error(`Failed to get user token from MAUI: ${response.status} - ${errorText}`);
@@ -224,6 +228,10 @@ export class AuthService {
         // Check if tokens count is in response body
         if (typeof data.tokens === 'number') {
           return data.tokens;
+        }
+        // Check if tokens are nested under response property
+        if (data.response && typeof data.response.tokens === 'number') {
+          return data.response.tokens;
         }
       } else {
         const errorText = await response.text();
