@@ -22,7 +22,7 @@ interface RecordingsListProps {
   showMessage: (message: string, severity: 'success' | 'error' | 'info' | 'warning') => void;
 }
 
-const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>((props, ref) => {
+const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>(function RecordingsList(props, ref) {
   const [localRecordings, setLocalRecordings] = useState<AudioRecording[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingLoading, setProcessingLoading] = useState<boolean>(false);
