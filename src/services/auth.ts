@@ -169,11 +169,10 @@ export class AuthService {
 
         if (response.ok) {
           const data = await response.json();
-          console.log('Response from /getusertokens:', data);
-          const tokens = response.headers.get('TOKENS');
-          if (tokens) {
-            console.log(`TOKENS: ${tokens}`);
-            return parseInt(tokens, 10);
+          console.log('Response from /getusertokens in authenticateMAUI:', data);
+          // Check if tokens count is in response body
+          if (typeof data.tokens === 'number') {
+            return data.tokens;
           }
         } else {
           const errorText = await response.text();
@@ -301,9 +300,11 @@ export class AuthService {
       });
 
       if (response.ok) {
-        const tokens = response.headers.get('TOKENS');
-        if (tokens) {
-          return parseInt(tokens, 10);
+        const data = await response.json();
+        console.log('Response from /getusertokens in getTokenCount:', data);
+        // Check if tokens count is in response body
+        if (typeof data.tokens === 'number') {
+          return data.tokens;
         }
       } else {
         const errorText = await response.text();
