@@ -147,7 +147,7 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
 
       console.log('Form compilation result:', compilationResult);
 
-      if (Array.isArray(compilationResult) {
+      if (Array.isArray(compilationResult)) {
         // Mark as processed in local storage
         const updatedRecording = { 
           ...recording, 
