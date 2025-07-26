@@ -2,6 +2,12 @@ import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'rea
 import { AudioRecording } from '../../types/audio';
 import { ServerRecording } from '../../types/graphql';
 import { MAUIService } from '../../services/maui';
+import { 
+  MOCK_FORM_SCHEMA, 
+  MOCK_FORM_SCHEMA_NAME, 
+  MOCK_FORM_SCHEMA_EXAMPLE_DATA, 
+  MOCK_FORM_SCHEMA_CHOICES 
+} from '../../services/mockGraphql';
 import { useAuth } from '../../hooks/useAuth';
 import { useFormSchema } from '../../hooks/useUserData';
 import StorageService from '../../services/storage';
@@ -122,29 +128,11 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
       setProcessingLoading(true);
       setProcessingStep('Compiling form data...');
 
-      // Mock data for form schema
-      const mockFormSchemaName = "Example Form";
-      const mockFormSchema = {
-        "title": "Example Form",
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "age": {
-            "type": "number",
-            "title": "Age"
-          }
-        }
-      };
-      const mockFormSchemaExampleData = {
-        "name": "John Doe",
-        "age": 30
-      };
-      const mockFormSchemaChoices = {
-        "countries": ["USA", "Canada", "Mexico"]
-      };
+      // Use mock data from mockGraphql
+      const mockFormSchemaName = MOCK_FORM_SCHEMA_NAME;
+      const mockFormSchema = MOCK_FORM_SCHEMA;
+      const mockFormSchemaExampleData = MOCK_FORM_SCHEMA_EXAMPLE_DATA;
+      const mockFormSchemaChoices = MOCK_FORM_SCHEMA_CHOICES;
 
       // Create FormData object
       const formData = new FormData();
