@@ -1,6 +1,5 @@
-import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { AudioRecording } from '../../types/audio';
-import { ServerRecording } from '../../types/graphql';
 import { MAUIService } from '../../services/maui';
 import { 
   MOCK_FORM_SCHEMA, 
