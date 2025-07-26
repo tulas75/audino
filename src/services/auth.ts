@@ -84,10 +84,8 @@ export class AuthService {
 
     this.storeToken(authResponse.token);
     const tokenCount = await this.authenticateMAUI(authResponse.user.email);
-    if (tokenCount > 0) {
-      // Dispatch event to update UI
-      document.dispatchEvent(new CustomEvent('tokenCountUpdate', { detail: tokenCount }));
-    }
+    // Dispatch event to update UI regardless of token count
+    document.dispatchEvent(new CustomEvent('tokenCountUpdate', { detail: tokenCount }));
     return authResponse;
   }
 

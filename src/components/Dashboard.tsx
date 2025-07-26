@@ -96,25 +96,23 @@ const Dashboard = () => {
                   <path d="M15 13v2" />
                   <path d="M9 13v2" />
                 </svg>
-                {tokenCount > 0 && (
-                  <span style={{
-                    position: 'absolute',
-                    top: '-5px',
-                    right: '-5px',
-                    backgroundColor: '#ef4444',
-                    color: 'white',
-                    borderRadius: '50%',
-                    width: '18px',
-                    height: '18px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    fontSize: '0.65rem',
-                    fontWeight: 'bold'
-                  }}>
-                    {tokenCount}
-                  </span>
-                )}
+                <span style={{
+                  position: 'absolute',
+                  top: '-5px',
+                  right: '-5px',
+                  backgroundColor: tokenCount > 0 ? '#ef4444' : '#6b7280',
+                  color: 'white',
+                  borderRadius: '50%',
+                  width: '18px',
+                  height: '18px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  fontSize: '0.65rem',
+                  fontWeight: 'bold'
+                }}>
+                  {tokenCount}
+                </span>
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontWeight: '500', color: 'var(--gray-900)' }}>
