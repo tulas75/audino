@@ -3,9 +3,10 @@ import { useAudioRecorder } from '../../hooks/useAudioRecorder';
 
 interface AudioRecorderProps {
   onRecordingSaved?: () => void;
+  showMessage: (message: string, severity: 'success' | 'error' | 'info' | 'warning') => void;
 }
 
-const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingSaved }) => {
+const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingSaved, showMessage }) => {
   const [recordingName, setRecordingName] = useState('');
   const { 
     isRecording, 
