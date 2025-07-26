@@ -6,10 +6,23 @@ import RecordingsList from './Audio/RecordingsList';
 import FormSchemaDisplay from './FormSchemaDisplay';
 import { AuthService } from '../services/auth';
 
+// Snackbar types
+type SnackbarSeverity = 'success' | 'error' | 'info' | 'warning';
+interface SnackbarState {
+  open: boolean;
+  message: string;
+  severity: SnackbarSeverity;
+}
+
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const recordingsListRef = useRef<{ refreshRecordings: () => void }>(null);
   const [tokenCount, setTokenCount] = useState<number>(0);
+  const [snackbar, setSnackbar] = useState<SnackbarState>({
+    open: false,
+    message: '',
+    severity: 'info'
+  });
   
   // Fetch user profile from GraphQL
   const { userProfile, loading: profileLoading, error: profileError } = useUserProfile();
@@ -40,6 +53,14 @@ const Dashboard = () => {
     if (recordingsListRef.current) {
       recordingsListRef.current.refreshRecordings();
     }
+  };
+
+  const showSnackbar = (message: string, severity: SnackbarSeverity = 'info') => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar(prev => ({ ...prev, open: false }));
   };
 
   // Display user profile data if available, fallback to auth user
@@ -151,9 +172,44 @@ const Dashboard = () => {
         }}>
           <FormSchemaDisplay />
           <AudioRecorder onRecordingSaved={handleRecordingSaved} />
-          <RecordingsList ref={recordingsListRef} />
+          <RecordingsList ref={recordingsListRef} showMessage={showSnackbar} />
         </div>
       </main>
+
+      {/* Snackbar */}
+      {snackbar.open && (
+        <div style={{
+          position: 'fixed',
+          bottom: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: snackbar.severity === 'success' ? '#4caf50' : 
+                          snackbar.severity === 'error' ? '#f44336' :
+                          snackbar.severity === 'warning' ? '#ff9800' : '#2196f3',
+          color: 'white',
+          padding: '10px 20px',
+          borderRadius: '4px',
+          boxShadow: '0 3px 5px rgba(0,0,0,0.2)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          zIndex: 1000
+        }}>
+          <div>{snackbar.message}</div>
+          <button 
+            onClick={handleCloseSnackbar}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'white',
+              cursor: 'pointer',
+              fontSize: '1.2rem'
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
     </div>
   );
 };

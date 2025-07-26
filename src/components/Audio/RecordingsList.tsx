@@ -18,7 +18,11 @@ export interface RecordingsListRef {
   refreshRecordings: () => void;
 }
 
-const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
+interface RecordingsListProps {
+  showMessage: (message: string, severity: 'success' | 'error' | 'info' | 'warning') => void;
+}
+
+const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>((props, ref) => {
   const [localRecordings, setLocalRecordings] = useState<AudioRecording[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingLoading, setProcessingLoading] = useState(false);
@@ -110,17 +114,17 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
 
   const handleProcessWithMAUI = async (recording: AudioRecording) => {
     if (!token) {
-      alert('Authentication token not available. Please log in again.');
+      props.showMessage('Authentication token not available. Please log in again.', 'error');
       return;
     }
 
     if (!formSchema || !formSchemaName || !formSchemaExampleData || !formSchemaChoices) {
-      alert('Form schema data not loaded. Please wait and try again.');
+      props.showMessage('Form schema data not loaded. Please wait and try again.', 'error');
       return;
     }
 
     if (!recording.transcription) {
-      alert('Transcription is required before processing. Please wait for transcription to complete.');
+      props.showMessage('Transcription is required before processing. Please wait for transcription to complete.', 'warning');
       return;
     }
 
@@ -162,10 +166,10 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
       console.log('Form compilation result:', JSON.stringify(compilationResult, null, 2));
       
       // Show success message
-      alert(`Processing completed successfully!`);
+      props.showMessage('Processing completed successfully!', 'success');
     } catch (error) {
       console.error('Error processing with MAUI:', error);
-      alert(`Failed to process recording: ${error.message}`);
+      props.showMessage(`Failed to process recording: ${error.message}`, 'error');
     } finally {
       setProcessingLoading(false);
       setProcessingStep('');
