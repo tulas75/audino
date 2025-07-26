@@ -53,9 +53,12 @@ const RecordingsList = forwardRef<RecordingsListRef>((props, ref) => {
     try {
       console.log('Starting transcription for:', recording.name);
       
-      const transcriptionResult = import.meta.env.DEV 
-        ? await mauiService.mockTranscribeAudio(recording.blob)
-        : await mauiService.transcribeAudio(recording.blob, token);
+      let transcriptionResult;
+      if (import.meta.env.VITE_USE_MOCK_AUDIO) {
+        transcriptionResult = await mauiService.mockTranscribeAudio(recording.blob);
+      } else {
+        transcriptionResult = await mauiService.transcribeAudio(recording.blob, token);
+      }
 
       const updatedRecording = {
         ...recording,
