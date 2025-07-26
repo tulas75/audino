@@ -199,11 +199,12 @@ export class AuthService {
         if (response.ok) {
           const data = await response.json();
           console.log('Response from /checkpandinouser:', data);
-          if (typeof data.api_key !== 'undefined') {
-            localStorage.setItem('pandas_dino_api_key', data.api_key);
+          if (data.response?.user?.api_key) {
+            const apiKey = data.response.user.api_key;
+            localStorage.setItem('pandas_dino_api_key', apiKey);
             console.log('Saved pandas_dino_api_key in localStorage');
           } else {
-            console.warn('Response did not contain api_key property');
+            console.warn('Response did not contain the expected api_key property');
           }
         } else {
           const errorText = await response.text();
