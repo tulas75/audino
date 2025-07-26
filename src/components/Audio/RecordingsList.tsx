@@ -25,7 +25,7 @@ interface RecordingsListProps {
 const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>((props, ref) => {
   const [localRecordings, setLocalRecordings] = useState<AudioRecording[]>([]);
   const [loading, setLoading] = useState(true);
-  const [processingLoading, setProcessingLoading] = useState(false);
+  const [processingLoading, setProcessingLoading] = useState<boolean>(false);
   const [processingStep, setProcessingStep] = useState<string>('');
   
   const storageService = StorageService.getInstance();
