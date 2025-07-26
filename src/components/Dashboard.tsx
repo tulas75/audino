@@ -117,7 +117,7 @@ const Dashboard = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <div style={{ position: 'relative' }}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 8V4H8" />
                   <rect width="16" height="12" x="4" y="8" rx="2" />
                   <path d="M2 14h2" />
@@ -127,17 +127,17 @@ const Dashboard = () => {
                 </svg>
                 <span style={{
                   position: 'absolute',
-                  top: '-5px',
-                  right: '-5px',
+                  top: '-6px',
+                  right: '-6px',
                   backgroundColor: tokenCount > 0 ? '#ef4444' : '#6b7280',
                   color: 'white',
                   borderRadius: '50%',
-                  width: '18px',
-                  height: '18px',
+                  width: '22px',
+                  height: '22px',
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  fontSize: '0.65rem',
+                  fontSize: '0.75rem',
                   fontWeight: 'bold'
                 }}>
                   {tokenCount}
