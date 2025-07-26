@@ -27,6 +27,7 @@ const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>(functi
   const [loading, setLoading] = useState(true);
   const [processingLoading, setProcessingLoading] = useState<boolean>(false);
   const [processingStep, setProcessingStep] = useState<string>('');
+  const [recordingToDelete, setRecordingToDelete] = useState<AudioRecording | null>(null);
   
   const storageService = StorageService.getInstance();
   const mauiService = MAUIService.getInstance();
@@ -101,18 +102,27 @@ const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>(functi
     loadLocalRecordings();
   }, []);
 
-  const handleDeleteLocal = async (id: string) => {
-    const confirmed = window.confirm('Are you sure you want to delete this recording?');
-    if (!confirmed) return;
+  const handleDeleteLocal = async (recording: AudioRecording) => {
+    setRecordingToDelete(recording);
+  };
+
+  const confirmDelete = async () => {
+    if (!recordingToDelete) return;
     
     try {
-      await storageService.deleteRecording(id);
-      setLocalRecordings(prev => prev.filter(r => r.id !== id));
+      await storageService.deleteRecording(recordingToDelete.id);
+      setLocalRecordings(prev => prev.filter(r => r.id !== recordingToDelete.id));
       props.showMessage('Recording deleted successfully', 'success');
     } catch (error) {
       console.error('Error deleting local recording:', error);
       props.showMessage('Failed to delete recording', 'error');
+    } finally {
+      setRecordingToDelete(null);
     }
+  };
+
+  const cancelDelete = () => {
+    setRecordingToDelete(null);
   };
 
 
@@ -338,7 +348,7 @@ const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>(functi
                        'Process with MAUI'}
                     </button>
                     <button 
-                      onClick={() => handleDeleteLocal(recording.id)}
+                      onClick={() => handleDeleteLocal(recording)}
                       className="btn btn-danger"
                       disabled={processingLoading}
                     >
@@ -351,6 +361,123 @@ const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>(functi
           </div>
         )}
       </div>
+
+      {/* Fancy Delete Confirmation Modal */}
+      {recordingToDelete && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+            padding: '2rem',
+            borderRadius: '16px',
+            maxWidth: '450px',
+            width: '90%',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            animation: 'modalSlideIn 0.3s ease-out'
+          }}>
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              <div style={{
+                fontSize: '3rem',
+                marginBottom: '1rem',
+                color: '#ff6b6b'
+              }}>
+                🗑️
+              </div>
+              <h3 style={{ 
+                margin: 0, 
+                marginBottom: '0.5rem',
+                color: '#2c3e50',
+                fontSize: '1.4rem',
+                fontWeight: '600'
+              }}>
+                Delete Recording
+              </h3>
+              <p style={{ 
+                margin: 0,
+                color: '#6c757d',
+                fontSize: '1rem',
+                lineHeight: '1.5'
+              }}>
+                Are you sure you want to delete <strong>"{recordingToDelete.name}"</strong>?
+                <br />
+                <span style={{ fontSize: '0.9rem', color: '#dc3545' }}>
+                  This action cannot be undone.
+                </span>
+              </p>
+            </div>
+            
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              gap: '1rem',
+              marginTop: '2rem'
+            }}>
+              <button 
+                onClick={cancelDelete}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  border: '2px solid #6c757d',
+                  backgroundColor: 'transparent',
+                  color: '#6c757d',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: '500',
+                  minWidth: '100px',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = '#6c757d';
+                  e.target.style.color = 'white';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.color = '#6c757d';
+                }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmDelete}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  border: '2px solid #dc3545',
+                  backgroundColor: '#dc3545',
+                  color: 'white',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: '500',
+                  minWidth: '100px',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = '#c82333';
+                  e.target.style.borderColor = '#c82333';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = '#dc3545';
+                  e.target.style.borderColor = '#dc3545';
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 });
