@@ -83,7 +83,11 @@ export class AuthService {
     }
 
     this.storeToken(authResponse.token);
-    this.authenticateMAUI(authResponse.user.email).catch(console.error);
+    const tokenCount = await this.authenticateMAUI(authResponse.user.email);
+    if (tokenCount > 0) {
+      // Dispatch event to update UI
+      document.dispatchEvent(new CustomEvent('tokenCountUpdate', { detail: tokenCount }));
+    }
     return authResponse;
   }
 
@@ -176,13 +180,16 @@ export class AuthService {
           const tokens = response.headers.get('TOKENS');
           if (tokens) {
             console.log(`TOKENS: ${tokens}`);
+            return parseInt(tokens, 10);
           }
         } else {
           const errorText = await response.text();
           console.error(`Failed to get user token from MAUI: ${response.status} - ${errorText}`);
         }
+        return 0;
       } catch (error) {
         console.error('Error during POST to MAUI /getusertokens', error);
+        return 0;
       }
     } else {
       // POST call to /checkpandinouser

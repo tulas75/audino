@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useUserProfile } from '../hooks/useUserData';
 import AudioRecorder from './Audio/AudioRecorder';
@@ -8,9 +8,22 @@ import FormSchemaDisplay from './FormSchemaDisplay';
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const recordingsListRef = useRef<{ refreshRecordings: () => void }>(null);
+  const [tokenCount, setTokenCount] = useState<number>(0);
   
   // Fetch user profile from GraphQL
   const { userProfile, loading: profileLoading, error: profileError } = useUserProfile();
+
+  useEffect(() => {
+    const handleTokenCountUpdate = (event: CustomEvent) => {
+      setTokenCount(event.detail);
+    };
+
+    document.addEventListener('tokenCountUpdate', handleTokenCountUpdate as EventListener);
+    
+    return () => {
+      document.removeEventListener('tokenCountUpdate', handleTokenCountUpdate as EventListener);
+    };
+  }, []);
 
   const handleRecordingSaved = () => {
     // Refresh local recordings when a new recording is saved
@@ -63,15 +76,46 @@ const Dashboard = () => {
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontWeight: '500', color: 'var(--gray-900)' }}>
-                {displayUser?.name || displayUser?.email}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ position: 'relative' }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 8V4H8" />
+                  <rect width="16" height="12" x="4" y="8" rx="2" />
+                  <path d="M2 14h2" />
+                  <path d="M20 14h2" />
+                  <path d="M15 13v2" />
+                  <path d="M9 13v2" />
+                </svg>
+                {tokenCount > 0 && (
+                  <span style={{
+                    position: 'absolute',
+                    top: '-5px',
+                    right: '-5px',
+                    backgroundColor: '#ef4444',
+                    color: 'white',
+                    borderRadius: '50%',
+                    width: '18px',
+                    height: '18px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    fontSize: '0.65rem',
+                    fontWeight: 'bold'
+                  }}>
+                    {tokenCount}
+                  </span>
+                )}
               </div>
-              {profileLoading && (
-                <div style={{ fontSize: '0.75rem', color: 'var(--gray-500)' }}>
-                  Loading profile...
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontWeight: '500', color: 'var(--gray-900)' }}>
+                  {displayUser?.name || displayUser?.email}
                 </div>
-              )}
+                {profileLoading && (
+                  <div style={{ fontSize: '0.75rem', color: 'var(--gray-500)' }}>
+                    Loading profile...
+                  </div>
+                )}
+              </div>
             </div>
             <button onClick={logout} className="btn btn-secondary">
               Sign Out
