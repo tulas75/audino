@@ -31,7 +31,8 @@ const RecordingsList = forwardRef<RecordingsListRef, RecordingsListProps>((props
   const storageService = StorageService.getInstance();
   const mauiService = MAUIService.getInstance();
   const { token } = useAuth();
-  const { formSchema, formSchemaName, formSchemaExampleData, formSchemaChoices } = useFormSchema() || {};
+  const formSchemaData = useFormSchema();
+  const { formSchema, formSchemaName, formSchemaExampleData, formSchemaChoices } = formSchemaData || {};
 
   const loadLocalRecordings = async () => {
     try {
