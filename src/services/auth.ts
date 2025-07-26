@@ -151,20 +151,15 @@ export class AuthService {
     };
   }
 
-  private async authenticateMAUI(userEmail: string): Promise<void> {
+  private async authenticateMAUI(userEmail: string): Promise<number> {
     const mauiBaseUrl = import.meta.env.VITE_MAUI_API_URL;
     if (!mauiBaseUrl) {
       console.error('VITE_MAUI_API_URL is not set');
-      return;
+      return 0;
     }
 
     const apiKey = localStorage.getItem('pandas_dino_api_key');
     if (apiKey) {
-      // GET call to /getusertokens
-      const url = new URL(`${mauiBaseUrl}/getusertokens`);
-      url.searchParams.append('api_key', apiKey);
-      url.searchParams.append('user_email', userEmail);
-
       try {
         const response = await fetch(`${mauiBaseUrl}/getusertokens`, {
           method: 'POST',
@@ -196,13 +191,13 @@ export class AuthService {
       const token = this.getStoredToken();
       if (!token) {
         console.error('No auth token available');
-        return;
+        return 0;
       }
 
       const graphqlEndpoint = import.meta.env.VITE_GRAPHQL_ENDPOINT;
       if (!graphqlEndpoint) {
         console.error('VITE_GRAPHQL_ENDPOINT is not set');
-        return;
+        return 0;
       }
 
       try {
@@ -222,6 +217,12 @@ export class AuthService {
             const apiKey = data.response.user.api_key;
             localStorage.setItem('pandas_dino_api_key', apiKey);
             console.log('Saved pandas_dino_api_key in localStorage');
+            
+            // After saving key, fetch token count
+            const newApiKey = localStorage.getItem('pandas_dino_api_key');
+            if (newApiKey) {
+              return this.authenticateMAUI(userEmail);
+            }
           } else {
             console.warn('Response did not contain the expected api_key property');
           }
@@ -232,6 +233,7 @@ export class AuthService {
       } catch (error) {
         console.error('Error during POST to MAUI /checkpandinouser', error);
       }
+      return 0;
     }
   }
 
